@@ -2,7 +2,7 @@
 date: 2025-02-02
 ---
 # Authentication in Azure
-
+#Azure #Concept 
 ## Authentication Methods
 - **Account Key**: Similar to Access Key in AWS.
 - **Azure Key Vault**: Securely store and manage secrets, keys, and certificates.
