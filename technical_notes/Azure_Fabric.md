@@ -721,6 +721,8 @@ V-Order enables **Direct Lake Semantic Models** to:
 [[FabricConcepts]]
 #inprogress
 ### Requirement
+ 1) Fabric Database is not available on all the region. [[Fabric region availability - Microsoft Fabric | Microsoft Learn](https://learn.microsoft.com/en-us/fabric/admin/region-availability)]
+ 
 # Optimize Write for Apache Spark  
 
 🔗 **Reference:** [A Deep Dive into Optimized Write in Microsoft Fabric](https://milescole.dev/data-engineering/2024/08/16/A-Deep-Dive-into-Optimized-Write-in-Microsoft-Fabric.html)  

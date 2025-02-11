@@ -14,7 +14,7 @@
               "type": "markdown",
               "state": {
                 "file": "Azure_Fabric.md",
-                "mode": "source",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
@@ -146,7 +146,8 @@
               "title": "Outline of Azure_Fabric"
             }
           }
-        ]
+        ],
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
