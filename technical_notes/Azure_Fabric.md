@@ -5,7 +5,8 @@ date: 2025-01-29T00:00:00.000Z
 ---
 # #2Read:
 
-- https://medium.com/@jacobrnnowjensen/putting-microsoft-fabric-to-the-test-34b7383a9546
+- https://www.youtube.com/watch?v=U8FxNcerLa0
+-  [ ] https://medium.com/@jacobrnnowjensen/putting-microsoft-fabric-to-the-test-34b7383a9546
 - [X] [Nice article for  Data Ingestion](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/cloud-scale-analytics/best-practices/automated-ingestion-pattern)
 - [X] [Metadata driven] (https://techcommunity.microsoft.com/blog/fasttrackforazureblog/microsoft-fabric-metadata-driven-pipelines-with-mirrored-databases/4222480)
 
