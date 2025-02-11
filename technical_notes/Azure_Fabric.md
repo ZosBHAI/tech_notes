@@ -718,6 +718,9 @@ V-Order enables **Direct Lake Semantic Models** to:
 
 
 # Fabric Database
+[[FabricConcepts]]
+#inprogress
+### Requirement
 # Optimize Write for Apache Spark  
 
 🔗 **Reference:** [A Deep Dive into Optimized Write in Microsoft Fabric](https://milescole.dev/data-engineering/2024/08/16/A-Deep-Dive-into-Optimized-Write-in-Microsoft-Fabric.html)  

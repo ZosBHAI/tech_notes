@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "929b00251bb90087",
+        "id": "7870fe9a499b25c2",
         "type": "tabs",
         "children": [
           {
-            "id": "dd54886815c33913",
+            "id": "79a70edfcae63fbd",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -40,8 +40,7 @@
             "state": {
               "type": "file-explorer",
               "state": {
-                "sortOrder": "alphabetical",
-                "autoReveal": false
+                "sortOrder": "alphabetical"
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -53,7 +52,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "tag:#inprogress",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -74,12 +73,12 @@
               "title": "Bookmarks"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
     "id": "ddcdeb503a4e5306",
@@ -95,16 +94,17 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "Azure_Fabric.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
                 "searchQuery": "",
-                "backlinkCollapsed": true,
+                "backlinkCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks"
+              "title": "Backlinks for Azure_Fabric"
             }
           },
           {
@@ -128,9 +128,7 @@
               "type": "tag",
               "state": {
                 "sortOrder": "frequency",
-                "useHierarchy": true,
-                "showSearch": false,
-                "searchQuery": ""
+                "useHierarchy": true
               },
               "icon": "lucide-tags",
               "title": "Tags"
@@ -148,8 +146,7 @@
               "title": "Outline of Azure_Fabric"
             }
           }
-        ],
-        "currentTab": 3
+        ]
       }
     ],
     "direction": "horizontal",
@@ -165,10 +162,12 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "dd54886815c33913",
+  "active": "79a70edfcae63fbd",
   "lastOpenFiles": [
     "tags/FabricConcepts.md",
     "Azure_Fabric.md",
+    "2025-02-11.md",
+    "Untitled.canvas",
     "tags/Architecture & Design.md",
     "tags/Synapse.md",
     "Airflow_notes.md",
@@ -180,7 +179,6 @@
     "Spark_Notes.md",
     "Fabric_SQL_SQL_Server.md",
     "Design_Pattern_Notes.md",
-    "DBX_Lakehouse_Architecture.md",
-    "Untitled.canvas"
+    "DBX_Lakehouse_Architecture.md"
   ]
 }
