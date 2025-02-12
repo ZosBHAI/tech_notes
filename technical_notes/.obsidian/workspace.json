@@ -14,7 +14,7 @@
               "type": "markdown",
               "state": {
                 "file": "Azure_Fabric.md",
-                "mode": "preview",
+                "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
@@ -40,7 +40,8 @@
             "state": {
               "type": "file-explorer",
               "state": {
-                "sortOrder": "alphabetical"
+                "sortOrder": "alphabetical",
+                "autoReveal": false
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -52,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "tag:#inprogress",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -73,8 +74,7 @@
               "title": "Bookmarks"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -140,7 +140,10 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Azure_Fabric.md"
+                "file": "Azure_Fabric.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-list",
               "title": "Outline of Azure_Fabric"
@@ -165,8 +168,10 @@
   },
   "active": "79a70edfcae63fbd",
   "lastOpenFiles": [
-    "tags/FabricConcepts.md",
+    "Delta_table.md",
     "Azure_Fabric.md",
+    "tags/delta_table_concepts.md",
+    "tags/FabricConcepts.md",
     "2025-02-11.md",
     "Untitled.canvas",
     "tags/Architecture & Design.md",

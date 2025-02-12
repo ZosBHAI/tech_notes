@@ -310,9 +310,11 @@ This applies to both **Table** and **File**:
 21. When you mention **LOCATION** in **CREATE TABLE** or **path** in the **saveTableAs** Spark API, the table will be created as an **External table**.
 22. Both the **External** and **Managed** tables will be available under the **Table section**.
 23. All the **Shortcut** created are like **Managed tables**.
+---
+# Fabric - In Relation with Delta Table
+[Delta Lake Interoperability](https://learn.microsoft.com/en-us/fabric/get-started/delta-lake-interoperability)
+[[delta_table_concepts]]
 
-#Fabric - In Relation with Delta Table
-[Reference](https://learn.microsoft.com/en-us/fabric/get-started/delta-lake-interoperability)
 ## Delta Table Column Mapping:
 24. Even in Databricks, this is a preview feature. In MS Fabric, you can create a **Delta table with Column mapping** using Spark Notebooks.
    - Unfortunately, it is not compatible with the **Data Warehouse**. This means it cannot be queried in the Warehouse.
