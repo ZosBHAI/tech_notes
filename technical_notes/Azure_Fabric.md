@@ -383,22 +383,27 @@ Ref: [Deletion Vectors](https://milescole.dev/data-engineering/2024/11/04/Deleti
 ## Change Data Feed:
 - This feature is useful when we need to identify the kind of operation at the **SOURCE**, based on the **ACTION type**, and decide if we need to perform some logic in the **TARGET**.
 - If the use case is simply **incremental reads**, add a **timestamp column** and read it incrementally.
+## Restore to Previous Version:
+1) Use this feature when you want to restore data. We can achieve this with a `DELETE` but this is  a file operation. When you use `RESTORE` it is a metadata operation.
+2) To restore a delta table to  previous version, use `TIME TRAVEL` functionality or `RESTORE`
+3) **Time Travel** we use read the previous version using `asOfVersion`, then `overwrite` target table
+4) **Restore** we need to mention version(in this case it is previous version) that needs to be restored.
 
 **Reference**: [Delta Change Data Feed in Fabric Lakehouses](https://www.serverlesssql.com/delta-change-data-feed-in-fabric-lakehouses/)
+---
 
-#Fabric - Warehousing
+# Fabric - Warehousing
 
 ### Foreign Key:
-32) **Fabric Warehouse** supports **foreign key constraints** but they **can't be enforced**. Therefore, it's important that your **ETL process** tests for integrity between related tables when data is loaded.
-33) It's still a good idea to create **foreign keys**. One good reason to create unenforced foreign keys is to allow **modeling tools**, like **Power BI Desktop**, to automatically detect and create relationships between tables in the semantic model.
+5) **Fabric Warehouse** supports **foreign key constraints** but they **can't be enforced**. Therefore, it's important that your **ETL process** tests for integrity between related tables when data is loaded.
+6) It's still a good idea to create **foreign keys**. One good reason to create unenforced foreign keys is to allow **modeling tools**, like **Power BI Desktop**, to automatically detect and create relationships between tables in the semantic model.
 
 **Reference**: [Dimensional Modeling in Fabric Data Warehouse](https://learn.microsoft.com/en-us/fabric/data-warehouse/dimensional-modeling-dimension-tables)
 
-#Fabric - Warehousing
 
 ### Foreign Key:
-34) **Fabric Warehouse** supports **foreign key constraints** but they **can't be enforced**. Therefore, it's important that your **ETL process** tests for integrity between related tables when data is loaded.
-35) It's still a good idea to create **foreign keys**. One good reason to create unenforced foreign keys is to allow **modeling tools**, like **Power BI Desktop**, to automatically detect and create relationships between tables in the semantic model.
+7) **Fabric Warehouse** supports **foreign key constraints** but they **can't be enforced**. Therefore, it's important that your **ETL process** tests for integrity between related tables when data is loaded.
+8) It's still a good idea to create **foreign keys**. One good reason to create unenforced foreign keys is to allow **modeling tools**, like **Power BI Desktop**, to automatically detect and create relationships between tables in the semantic model.
 
 **Reference**: [Dimensional Modeling in Fabric Data Warehouse](https://learn.microsoft.com/en-us/fabric/data-warehouse/dimensional-modeling-dimension-tables)
 
@@ -431,8 +436,8 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 ## Best Practices - Mirroring & Capacity  
 **Reference:** [Fabric Mirroring - Replacing E-ETL](https://www.element61.be/en/resource/fabric-mirroring-replacing-e-etl)  
 
-36. If your source has **frequent changes** and requires **24/7 data availability**, a **dedicated lower-grade capacity** for mirroring may be more cost-effective than using a high-end compute resource.  
-37. If your source has **small, infrequent changes**, consider a separate capacity with scheduled start and pause times to avoid unnecessary costs.  
+9. If your source has **frequent changes** and requires **24/7 data availability**, a **dedicated lower-grade capacity** for mirroring may be more cost-effective than using a high-end compute resource.  
+10. If your source has **small, infrequent changes**, consider a separate capacity with scheduled start and pause times to avoid unnecessary costs.  
    - Capacity start and pause can be managed via **Azure REST APIs**.  
 #Fabric - Warehousing - Data Recovery
 
@@ -443,8 +448,8 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 - There will be **Storage** and **Compute** costs associated with the Restore Point.
 
 ### Limitation:
-38) A **recovery point** can't be restored to create a new warehouse with a different name, either within or across the Microsoft Fabric workspaces.
-39) **Restore points** can't be retained beyond the default **thirty calendar day** retention period. This retention period isn't currently configurable.
+11) A **recovery point** can't be restored to create a new warehouse with a different name, either within or across the Microsoft Fabric workspaces.
+12) **Restore points** can't be retained beyond the default **thirty calendar day** retention period. This retention period isn't currently configurable.
 
 ### Clone Table:
 #Fabric -ALTER
@@ -453,10 +458,10 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 - [The Reality of ALTER Table in Fabric Warehouses](https://www.serverlesssql.com/the-reality-of-alter-table-in-fabric-warehouses-2/)
 
 ### Key Points:
-40) **ALTER Table Usage**:
+13) **ALTER Table Usage**:
    - **Supports adding a column** but **does not support** dropping a column or changing the datatype of a column.
 
-41) **To Add a Column for a Table in the Lakehouse**:
+14) **To Add a Column for a Table in the Lakehouse**:
    - You need to **change the protocol version**. Use the following code:
    
    ```sql
@@ -573,7 +578,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 # Fabric SQL - Limitations in Warehouse  
 
 ## Temporary Tables  
-42. **Limited Usage:** Temporary tables are supported but with restrictions:  
+15. **Limited Usage:** Temporary tables are supported but with restrictions:  
    - You **cannot join** a temporary table with a normal table.  
    - `INSERT INTO` with `SELECT * FROM` a normal table **is not supported**.  
    - **Reference:** [Temp Tables in Fabric Warehouses](https://www.serverlesssql.com/temp-tables-in-fabric-warehouses/)  
@@ -584,7 +589,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 ---
 
 # ALTER Statement Limitations  
-43. **Dropping Columns & Changing Datatypes:**  
+16. **Dropping Columns & Changing Datatypes:**  
    - You **cannot drop columns** or **change the datatype** using `ALTER TABLE`.  
    - **Time Travel Functionality is Lost:** When you apply an `ALTER TABLE`, **time travel tracking is reset** to the timestamp of the alteration.  
 
@@ -594,7 +599,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 # Fabric Notebook - Warehouse Table  
 
 ## Sync Issues Between Warehouse Table and Notebook  
-44. **Data Discrepancy:** There may be a synchronization issue between **Warehouse tables and Notebooks**, leading to:  
+17. **Data Discrepancy:** There may be a synchronization issue between **Warehouse tables and Notebooks**, leading to:  
    - **Count mismatches** when querying data in the notebook versus querying via `SELECT * FROM` in the Lakehouse table.  
    - **Duplicated rows** or **inconsistent results** between Notebook and SQL Endpoint.  
 
@@ -636,9 +641,9 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 
 ### Solutions for WRITE Conflicts:  
 
-45. **Append-Only Table for Metadata**  
-46. **Monitor Lock & Retry the INSERT** (requires privileged access)  
-47. **In Databricks:**  
+18. **Append-Only Table for Metadata**  
+19. **Monitor Lock & Retry the INSERT** (requires privileged access)  
+20. **In Databricks:**  
    - Handled using **Isolation Levels**  
    - **Partitioning the table**  
 
@@ -673,7 +678,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 > *"V-Order sorting has a 15% impact on average write times but provides up to 50% more compression."*  
 
 #### **How is V-Order enabled?**  
-48. **Automatically enabled by Microsoft Fabric:**  
+21. **Automatically enabled by Microsoft Fabric:**  
    ```sql
    spark.conf.set("spark.microsoft.delta.optimizeWrite.enabled", "true")
    ```
@@ -980,11 +985,11 @@ So candidates include flags and indicators, order status, and customer demograph
 - **Refresh the SEMANTIC model** when using IMPORT mode  
 
 ### **Setup Git Integration with Azure DevOps**  
-49. Create a **Project & Repo** in Azure DevOps  
-50. In **Fabric Workspace**, enable **Git Integration**  
+22. Create a **Project & Repo** in Azure DevOps  
+23. In **Fabric Workspace**, enable **Git Integration**  
    - Specify the **Project & Branch**  
    - Ensure the **Azure DevOps account matches** the Fabric workspace user  
-51. **Lock the main branch** using **Branch Policies** (Settings → Branch Policy)  
+24. **Lock the main branch** using **Branch Policies** (Settings → Branch Policy)  
 
 ### **Continuous Integration (CI) in Fabric**  
 - Multiple users can update an object  
