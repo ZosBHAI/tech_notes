@@ -7,20 +7,20 @@ date: 2025-01-29T00:00:00.000Z
 
 - https://www.youtube.com/watch?v=U8FxNcerLa0
 -  [ ] https://medium.com/@jacobrnnowjensen/putting-microsoft-fabric-to-the-test-34b7383a9546
-- [X] [Nice article for  Data Ingestion](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/cloud-scale-analytics/best-practices/automated-ingestion-pattern)
-- [X] [Metadata driven] (https://techcommunity.microsoft.com/blog/fasttrackforazureblog/microsoft-fabric-metadata-driven-pipelines-with-mirrored-databases/4222480)
+- [ ] [Nice article for  Data Ingestion](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/cloud-scale-analytics/best-practices/automated-ingestion-pattern)
+- [ ] [Metadata driven] (https://techcommunity.microsoft.com/blog/fasttrackforazureblog/microsoft-fabric-metadata-driven-pipelines-with-mirrored-databases/4222480)
 
-- [X] https://milescole.dev/
-- [X] https://www.serverlesssql.com/category/fabric/page/3/
-- [X] [Usecase Fabric End to End flow](https://debruyn.dev/2023/fabric-end-to-end-use-case-analytics-engineering-part-1-dbt-with-the-lakehouse/)
-- [X] [Data Lake Implementation Fabric](
+- [ ] https://milescole.dev/
+- [ ] https://www.serverlesssql.com/category/fabric/page/3/
+- [ ] [Usecase Fabric End to End flow](https://debruyn.dev/2023/fabric-end-to-end-use-case-analytics-engineering-part-1-dbt-with-the-lakehouse/)
+- [ ] [Data Lake Implementation Fabric](
 https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-ccea72a8d162)
-- [X] [Fabric code to Get token](https://learn.microsoft.com/en-us/fabric/data-engineering/microsoft-spark-utilities#get-token)
-- [X] [Pandas Vs DuckDB Vs Pyspark in Fabric](https://medium.com/@mariusz_kujawski/exploring-python-libraries-for-data-engineering-in-ms-fabric-pandas-polars-duckdb-and-pyspark-8a7df3326193)
-- [X] [Sempy](https://learn.microsoft.com/en-us/python/api/semantic-link-sempy/sempy.fabric?view=semantic-link-python)
-- [X] [Invoke Fabric pipeline using Rest API](https://learn-it-all.medium.com/calling-a-fabric-data-pipeline-from-azure-data-factory-pipeline-b739418e6b34#:~:text=We%20essentially%20have%20two%20web,data%20pipeline%20using%20that%20token.&text=From%20the%20Fabric%20data%20pipeline,invoke%20from%20Azure%20Data%20factory.)
-- [X] [Connecting to Warehouse using JDBC](https://milescole.dev/data-engineering/2024/09/27/Another-Way-to-Connect-to-the-SQL-Endpoint.html)
-- [X] [Service Principal usage for Authentication](https://www.youtube.com/watch?v=_RXpvWjgZE8)
+- [ ] [Fabric code to Get token](https://learn.microsoft.com/en-us/fabric/data-engineering/microsoft-spark-utilities#get-token)
+- [ ] [Pandas Vs DuckDB Vs Pyspark in Fabric](https://medium.com/@mariusz_kujawski/exploring-python-libraries-for-data-engineering-in-ms-fabric-pandas-polars-duckdb-and-pyspark-8a7df3326193)
+- [ ] [Sempy](https://learn.microsoft.com/en-us/python/api/semantic-link-sempy/sempy.fabric?view=semantic-link-python)
+- [ ] [Invoke Fabric pipeline using Rest API](https://learn-it-all.medium.com/calling-a-fabric-data-pipeline-from-azure-data-factory-pipeline-b739418e6b34#:~:text=We%20essentially%20have%20two%20web,data%20pipeline%20using%20that%20token.&text=From%20the%20Fabric%20data%20pipeline,invoke%20from%20Azure%20Data%20factory.)
+- [ ] [Connecting to Warehouse using JDBC](https://milescole.dev/data-engineering/2024/09/27/Another-Way-to-Connect-to-the-SQL-Endpoint.html)
+- [ ] [Service Principal usage for Authentication](https://www.youtube.com/watch?v=_RXpvWjgZE8)
 
 # [[Synapse]]
 + Dedicated SQL Pool - use when you have large scale data warehousing solutions.
@@ -34,8 +34,8 @@ https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-
 	  1) Point is integration b/w ADLS and DataWarehouse is seemless
 	  2) Need not worry about the compute, say for example you need a seperate DBricks or HDInsight
 	  
-# Capacity 
-[[FabricConcepts]]
+# Capacity [[FabricConcepts]]
+
 
 #Azure/Fabric #Concept
 
@@ -75,7 +75,7 @@ https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-
 
 ---
 
-# Fabric - Capacity Metric App[[FabricConcepts]]
+# Fabric - Capacity Metric App [[FabricConcepts]]
 #Azure/Fabric #Concept 
 ## Throttling
 - It means if the resource consumption exceeds the allocated capacity. In Fabric, it happens in stages and is handled using the **SMOOTHING** technique. The process is stalled only when the consumption reaches the last stage.
@@ -88,8 +88,7 @@ https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-
 - If capacity overutilization is **> 10 mins and < 60 mins**, then there will be a delay of 20s in the interactive job.
 - If capacity overutilization is **> 60 mins and < 24 hours**, then interactive requests will be rejected.
 - If capacity overutilization is **> 24 hours**, then nothing is allowed to run (background rejection).
-# Elements
-[[FabricConcepts]]
+# Elements [[FabricConcepts]]
 1. Choose the capacity  
 2. Except Power BI (as it is completely independent), Fabric capacity is sufficient or free trial for running all the other experiences.  
 3. Create Workspace pointing to Capacity  
@@ -392,18 +391,10 @@ Ref: [Deletion Vectors](https://milescole.dev/data-engineering/2024/11/04/Deleti
 **Reference**: [Delta Change Data Feed in Fabric Lakehouses](https://www.serverlesssql.com/delta-change-data-feed-in-fabric-lakehouses/)
 ---
 
-# Fabric - Warehousing
-
+# Fabric - Warehousing [[FabricConcepts]]
 ### Foreign Key:
 5) **Fabric Warehouse** supports **foreign key constraints** but they **can't be enforced**. Therefore, it's important that your **ETL process** tests for integrity between related tables when data is loaded.
 6) It's still a good idea to create **foreign keys**. One good reason to create unenforced foreign keys is to allow **modeling tools**, like **Power BI Desktop**, to automatically detect and create relationships between tables in the semantic model.
-
-**Reference**: [Dimensional Modeling in Fabric Data Warehouse](https://learn.microsoft.com/en-us/fabric/data-warehouse/dimensional-modeling-dimension-tables)
-
-
-### Foreign Key:
-7) **Fabric Warehouse** supports **foreign key constraints** but they **can't be enforced**. Therefore, it's important that your **ETL process** tests for integrity between related tables when data is loaded.
-8) It's still a good idea to create **foreign keys**. One good reason to create unenforced foreign keys is to allow **modeling tools**, like **Power BI Desktop**, to automatically detect and create relationships between tables in the semantic model.
 
 **Reference**: [Dimensional Modeling in Fabric Data Warehouse](https://learn.microsoft.com/en-us/fabric/data-warehouse/dimensional-modeling-dimension-tables)
 
@@ -725,8 +716,7 @@ V-Order enables **Direct Lake Semantic Models** to:
 🔗 **Reference:** [To V-Order or Not?](https://milescole.dev/data-engineering/2024/09/17/To-V-Order-or-Not.html)  
 
 
-# Fabric Database
-[[FabricConcepts]]
+# Fabric Database [[FabricConcepts]]
 #inprogress
 ### Requirement
  1) Fabric Database is not available on all the region. [[Fabric region availability - Microsoft Fabric | Microsoft Learn](https://learn.microsoft.com/en-us/fabric/admin/region-availability)]
