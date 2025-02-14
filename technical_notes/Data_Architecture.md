@@ -748,56 +748,65 @@ Stores the following information:
    - **Solution 1**: Store as **STRING**.
    - **Solution 2**: Handle in the **visualization layer**.
 
-### **Ingestion Folder Structure**
-- **Recommended S3 Naming Convention**:
-source_system/raw/table/data --if we follow this naming, in case we need to build Glue Catalog, it is easy  
-source_system/raw/table/keys  
-source_system/raw/table/schema  
-
-- **Earlier S3 naming convention:**  
-source_system/raw/table/<<<data files>>>  
-source_system/raw/table/keys  
-
-  - **Note:** Here we cannot build Glue data catalog on `source_system/raw/table/` as there are extra folders under `table` like `keys`.
-
-
-## **Handling Missing Data in Curated Layer**
-### **Scenario: Base Layer Has No Data**
-- **Option 1**: Copy **previous run data from Curated layer ** to **Current Curated Layer**. This is the case when the GLUE Catalog refers the latest partition for all the FULL snapshot of the data.
-  - **Con**: Data duplication.
-- **Option 2**: Checking  for **Base Layer data in the Processing Layer(Spark)** (Not Orchestration Layer).**Ex:** Airlfow using Python Operator - if file exist - Task 1 dag else Trigger another task 
-  - **Pro**:
-    1. Above would introduce multiple tasks. If **failure occurs**, only **one task** in an **Airflow DAG** needs restarting.
-    2. **Parallelism** can be achieved using **Spark** (vs. an **Airflow operator**).
-
-
-
-## **Deployment Considerations**
-- **Configurations** stored in **Bitbucket**.
-- **Data** resides in **S3**.
-- Use **Service User** for deployment instead of individual users.
-  - **Service User** has **specific project permissions**.
-
-
-
-## **Infrastructure**
-- **CloudFormation Templates** are **preferred** for **spawning EMR/Infra**.
-- **Alternative**: Boto3 (not recommended since **CFTs are easier to maintain**).
-
-
-
-## **Source Profiling**
-- **Classify Tables by Record Volume**:
-  - **Small**, **Medium**, **Large**.
-- **Tables Without a Primary Key**:
-  - Perform a **full load** (if data volume is manageable).
+	### **Ingestion Folder Structure**
+	- **Recommended S3 Naming Convention**:
+	source_system/raw/table/data --if we follow this naming, in case we need to build Glue Catalog, it is easy  
+	source_system/raw/table/keys  
+	source_system/raw/table/schema  
+	
+	- **Earlier S3 naming convention:**  
+	source_system/raw/table/<<<data files>>>  
+	source_system/raw/table/keys  
+	
+	  - **Note:** Here we cannot build Glue data catalog on `source_system/raw/table/` as there are extra folders under `table` like `keys`.
+	
+	
+	## **Handling Missing Data in Curated Layer**
+	### **Scenario: Base Layer Has No Data**
+	- **Option 1**: Copy **previous run data from Curated layer ** to **Current Curated Layer**. This is the case when the GLUE Catalog refers the latest partition for all the FULL snapshot of the data.
+	  - **Con**: Data duplication.
+	- **Option 2**: Checking  for **Base Layer data in the Processing Layer(Spark)** (Not Orchestration Layer).**Ex:** Airlfow using Python Operator - if file exist - Task 1 dag else Trigger another task 
+	  - **Pro**:
+	    1. Above would introduce multiple tasks. If **failure occurs**, only **one task** in an **Airflow DAG** needs restarting.
+	    2. **Parallelism** can be achieved using **Spark** (vs. an **Airflow operator**).
+	
+	
+	
+	## **Deployment Considerations**
+	- **Configurations** stored in **Bitbucket**.
+	- **Data** resides in **S3**.
+	- Use **Service User** for deployment instead of individual users.
+	  - **Service User** has **specific project permissions**.
+	
+	
+	
+	## **Infrastructure**
+	- **CloudFormation Templates** are **preferred** for **spawning EMR/Infra**.
+	- **Alternative**: Boto3 (not recommended since **CFTs are easier to maintain**).
+	
+	
+	
+	## **Source Profiling**
+	- **Classify Tables by Record Volume**:
+	  - **Small**, **Medium**, **Large**.
+	- **Tables Without a Primary Key**:
+	  - Perform a **full load** (if data volume is manageable).
+	
+	---
+	
+	## **Issues Faced**
+	- **Oracle to Redshift Data Ingestion**:
+	  - **BLOB data type** can cause **memory issues**.
+	  - **Solution**:
+	    - If **Mxxk** does not use the column **downstream**, it **can be deleted**.
 
 ---
-
-## **Issues Faced**
-- **Oracle to Redshift Data Ingestion**:
-  - **BLOB data type** can cause **memory issues**.
-  - **Solution**:
-    - If **Mxxk** does not use the column **downstream**, it **can be deleted**.
-
----
+### **Use Case:  2 ETL jobs updating same table **
+      #Architecture/Orchestration 
+     [Use Fabric Notebook code based orchestration tool to avoid concurrent write conflicts. – Small Data And self service](https://datamonkeysite.com/2024/01/27/use-fabric-notebook-code-based-orchestration-tool-to-avoid-concurrency-write-conflicts/)
+	  
+	> I had a simple data ingestion use case, Notebook A inserts data to a Delta Table every 5 minutes and Notebook B backfills the same table with new fields but only at 4 am. Initially I just scheduled Notebook A to run every 5 minutes and Notebook B to run at 4 AM , did not work as I got a write conflict, basically Notebook B take longer time to process the data, when it is ready to update the table, it is a bit too late as it was already modified by Notebook A and you get this error.
+	- Solution 1: Schedule Notebook A every 5 minutes ,except 4 AM - 4:15 AM. This is not available in Fabric pipeline, but is available in Data Factory.
+	- Solution 2: Partition it based on time, for not so large volume of  data this approach can create multiple small files.
+	- Solution 3: Check if a refill file is available in the Notebook A and use `notebook.run()` utility  to  run the Notebook B from Notebook A.
+	---

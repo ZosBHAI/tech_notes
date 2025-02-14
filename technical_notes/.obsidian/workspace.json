@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Azure_Fabric.md",
+                "file": "Data_Architecture.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -28,7 +28,7 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "Azure_Fabric"
+              "title": "Data_Architecture"
             }
           }
         ]
@@ -106,7 +106,7 @@
               "type": "backlink",
               "state": {
                 "file": "Azure_Fabric.md",
-                "collapseAll": false,
+                "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
@@ -151,16 +151,17 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Azure_Fabric.md",
+                "file": "Data_Architecture.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Azure_Fabric"
+              "title": "Outline of Data_Architecture"
             }
           }
-        ]
+        ],
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
@@ -178,8 +179,8 @@
   },
   "active": "79a70edfcae63fbd",
   "lastOpenFiles": [
-    "tags/FabricConcepts.md",
     "Azure_Fabric.md",
+    "tags/FabricConcepts.md",
     "Delta_table.md",
     "tags/delta_table_concepts.md",
     "2025-02-11.md",

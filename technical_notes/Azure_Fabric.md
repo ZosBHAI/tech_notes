@@ -537,39 +537,68 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 
 
 
-# Fabric Notebook - Limitations  
-[Microsoft Fabric Notebook Limitations](https://learn.microsoft.com/en-us/fabric/data-engineering/notebook-limitation)  
+# Fabric Notebook 
+#Architecture 
+ ## Methods for Parallel Spark Orchestration [[Architecture & Design]]
+ ([Cluster Configuration Secrets for Spark: Unlocking Parallel Processing Power | Miles Cole](https://milescole.dev/optimization/2024/02/19/Unlocking-Parallel-Processing-Power.html))
+ 1) ## Running Many Jobs on a Single High-Concurrency Cluster:
+	 Issues with this approach:
+		**Concurrency Limited by Executors/Workers**: 
+		    >In environments like Databricks and Fabric, as opposed to open-source Spark, the number of executors is directly tied to the number of workers; a cluster with 4 workers equates to having 4 executors. This configuration limits the ability to run concurrent operations, as each executor is dedicated to a single job. Consequently, attempting to run 8 notebooks on a 4-worker cluster results in half of the notebooks being queued until an executor becomes available.
+        **Shared Driver Node Becomes a Bottleneck:**
+        Contrary to the distinct driver-executor model in open-source Spark, platforms like Databricks and Fabric utilize a shared driver across all jobs in a high-concurrency cluster. All operations are executed through a single JVM, which can quickly become overwhelmed by resource demands.
+ 2) ## Dedicated Job Cluster for Each Job:
+	 Issues with this approach:
+	- **Risk of Underutilized Compute Resources:**
+		- When each job runs on its dedicated compute resources without the possibility of sharing, there’s a risk that even minor tasks might not fully utilize the allocated resources. For instance, a small job running on a single-node, 4-core cluster might not use all available computing power, leading to inefficiencies.
+ 3) ## Use Multithreading for concurrent job execution:
+	 - Idea here is to run each job as a thread. **Things to keeps in mind** are how do we cancel the each job, because there is no inherent feature to cancel a thread that is already in sleep mode. `Concurrent.Futures` support cancelling of threads that have not started.
+	 - Capturing the thread status.
+	
+   
 
-### 1) **Returning Parameters from a Notebook**  
-- The number of rows that can be returned is **limited to 10K rows or 5MB**.  
+ ## Limitations
+- [Microsoft Fabric Notebook Limitations](https://learn.microsoft.com/en-us/fabric/data-engineering/notebook-limitation)  
+	### Size/Number of Parameters return:
+	 1) **Returning Parameters from a Notebook**  
+	- The number of rows that can be returned is **limited to 10K rows or 5MB**.  
+	
+	1) **Accessing Return Parameters as JSON**  
+	- Notebook return values can be accessed in **JSON format** using the following syntax:  
+	  ```text
+	  @Json(activity('Test Notebook').output.result.exitValue).message
+	  ```
+	  [Reference](https://community.fabric.microsoft.com/t5/Data-Pipeline/Referencing-notebook-exit-value-as-a-variable-in-a-data-pipeline/m-p/3507053)
 
-### 2) **Accessing Return Parameters as JSON**  
-- Notebook return values can be accessed in **JSON format** using the following syntax:  
-  ```text
-  @Json(activity('Test Notebook').output.result.exitValue).message
-  ```
-  [Reference](https://community.fabric.microsoft.com/t5/Data-Pipeline/Referencing-notebook-exit-value-as-a-variable-in-a-data-pipeline/m-p/3507053)
-
-  # Fabric Notebook - Spark Session  
-
-## 1) Shared Spark Session Between Master and Child Notebooks  
-- A **Master Notebook** shares its **Spark session** with child notebooks triggered using `mssparkutils.run()`.  
-- Example:  
-  ```python
-  mssparkutil.run('notebook1')  # Creates a temp view
-  mssparkutil.run('notebook2')  # Temp view from 'notebook1' is available in 'notebook2'
-  ```
-  **Reference:** [Microsoft Fabric - Shared Spark Sessions](https://christianhenrikreich.medium.com/microsoft-fabric-utilize-shared-sparksessions-fully-with-mssparkutils-notebook-run-and-runmultiple-79c780f5af1c)  
-
+## Spark Session  
+2) Shared Spark Session Between Master and Child Notebooks  
+	- A **Master Notebook** shares its **Spark session** with child notebooks triggered using `mssparkutils.run()`.  
+	- Example:  
+	  ```python
+	  mssparkutil.run('notebook1')  # Creates a temp view
+	  mssparkutil.run('notebook2')  # Temp view from 'notebook1' is available in 'notebook2'
+	  ```
+	  **Reference:** [Microsoft Fabric - Shared Spark Sessions](https://christianhenrikreich.medium.com/microsoft-fabric-utilize-shared-sparksessions-fully-with-mssparkutils-notebook-run-and-runmultiple-79c780f5af1c)  
+	
 > SparkSQL, which is a module in Spark Core, has an optimizer called **Catalyst**.  
 > SparkSQL has yet another component within Catalyst called **Catalog**.  
 > **Catalog is not Unity Catalog**, but a **meta datastore** for all known tables and views within the SparkSessions.  
 > Known tables can be **Hive tables, Unity Catalog tables, etc.**  
 
+## Fabric Notebook - Warehouse Table  
+
+## Sync Issues Between Warehouse Table and Notebook  
+3. **Data Discrepancy:** There may be a synchronization issue between **Warehouse tables and Notebooks**, leading to:  
+   - **Count mismatches** when querying data in the notebook versus querying via `SELECT * FROM` in the Lakehouse table.  
+   - **Duplicated rows** or **inconsistent results** between Notebook and SQL Endpoint.  
+
+### References:  
+- [Duplicated Rows Between Notebook and SQL Endpoint](https://community.fabric.microsoft.com/t5/Data-Engineering/Duplicated-rows-between-notebook-and-SQL-Endpoint/m-p/3707317)  
+- [Lakehouse Data Discrepancy Between Notebook and SQL Endpoint](https://community.fabric.microsoft.com/t5/Data-Science/Lakehouse-data-discrepancy-between-notebook-and-SQL-endpoint-or/m-p/4069421)  
 # Fabric SQL - Limitations in Warehouse  
 
 ## Temporary Tables  
-15. **Limited Usage:** Temporary tables are supported but with restrictions:  
+4. **Limited Usage:** Temporary tables are supported but with restrictions:  
    - You **cannot join** a temporary table with a normal table.  
    - `INSERT INTO` with `SELECT * FROM` a normal table **is not supported**.  
    - **Reference:** [Temp Tables in Fabric Warehouses](https://www.serverlesssql.com/temp-tables-in-fabric-warehouses/)  
@@ -580,23 +609,14 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 ---
 
 # ALTER Statement Limitations  
-16. **Dropping Columns & Changing Datatypes:**  
+5. **Dropping Columns & Changing Datatypes:**  
    - You **cannot drop columns** or **change the datatype** using `ALTER TABLE`.  
    - **Time Travel Functionality is Lost:** When you apply an `ALTER TABLE`, **time travel tracking is reset** to the timestamp of the alteration.  
 
 > _“It’s worth noting that when issuing an ALTER TABLE statement, it resets the date/time the table is being tracked to the date/time the table was altered.  
 > For the existing functionality of altering a table to add primary, unique, and foreign key constraints, it probably did not surface that regularly as these are often implemented when a table is first created.  
 > But now we can add new columns, this issue may surface more regularly.”_  
-# Fabric Notebook - Warehouse Table  
 
-## Sync Issues Between Warehouse Table and Notebook  
-17. **Data Discrepancy:** There may be a synchronization issue between **Warehouse tables and Notebooks**, leading to:  
-   - **Count mismatches** when querying data in the notebook versus querying via `SELECT * FROM` in the Lakehouse table.  
-   - **Duplicated rows** or **inconsistent results** between Notebook and SQL Endpoint.  
-
-### References:  
-- [Duplicated Rows Between Notebook and SQL Endpoint](https://community.fabric.microsoft.com/t5/Data-Engineering/Duplicated-rows-between-notebook-and-SQL-Endpoint/m-p/3707317)  
-- [Lakehouse Data Discrepancy Between Notebook and SQL Endpoint](https://community.fabric.microsoft.com/t5/Data-Science/Lakehouse-data-discrepancy-between-notebook-and-SQL-endpoint-or/m-p/4069421)  
 
 # Fabric Warehouse & Delta Table
 
@@ -632,9 +652,9 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 
 ### Solutions for WRITE Conflicts:  
 
-18. **Append-Only Table for Metadata**  
-19. **Monitor Lock & Retry the INSERT** (requires privileged access)  
-20. **In Databricks:**  
+6. **Append-Only Table for Metadata**  
+7. **Monitor Lock & Retry the INSERT** (requires privileged access)  
+8. **In Databricks:**  
    - Handled using **Isolation Levels**  
    - **Partitioning the table**  
 
@@ -669,7 +689,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 > *"V-Order sorting has a 15% impact on average write times but provides up to 50% more compression."*  
 
 #### **How is V-Order enabled?**  
-21. **Automatically enabled by Microsoft Fabric:**  
+9. **Automatically enabled by Microsoft Fabric:**  
    ```sql
    spark.conf.set("spark.microsoft.delta.optimizeWrite.enabled", "true")
    ```
@@ -975,11 +995,11 @@ So candidates include flags and indicators, order status, and customer demograph
 - **Refresh the SEMANTIC model** when using IMPORT mode  
 
 ### **Setup Git Integration with Azure DevOps**  
-22. Create a **Project & Repo** in Azure DevOps  
-23. In **Fabric Workspace**, enable **Git Integration**  
+10. Create a **Project & Repo** in Azure DevOps  
+11. In **Fabric Workspace**, enable **Git Integration**  
    - Specify the **Project & Branch**  
    - Ensure the **Azure DevOps account matches** the Fabric workspace user  
-24. **Lock the main branch** using **Branch Policies** (Settings → Branch Policy)  
+12. **Lock the main branch** using **Branch Policies** (Settings → Branch Policy)  
 
 ### **Continuous Integration (CI) in Fabric**  
 - Multiple users can update an object  
