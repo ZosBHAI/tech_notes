@@ -598,13 +598,13 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 		 **Default Starter Pool**
 		 10 nodes  
 		  Node size: Medium (8 vCores per node)  
-		Result: Only 1 notebook can run at once in the default starter pool.  
+		Result: Only 1 notebook can run at once in the default starter pool. 
 			
-		$$
-			
-			DOP = \frac{128}{(10 \times 8)} = \frac{128}{80} = 1.6 \Rightarrow \text{Rounded Down to } 1
-			
-		$$
+	$$
+		
+		DOP = \frac{128}{(10 \times 8)} = \frac{128}{80} = 1.6 \Rightarrow \text{Rounded Down to } 1
+		
+	$$
 		 
 	**Optimized Setup for Higher DOP**
 			To improve concurrency, a custom pool is used with:  
