@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Data_Architecture.md",
+                "file": "Azure_Fabric.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -28,7 +28,7 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "Data_Architecture"
+              "title": "Azure_Fabric"
             }
           }
         ]
@@ -84,8 +84,7 @@
               "title": "Bookmarks"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -151,13 +150,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Data_Architecture.md",
+                "file": "Azure_Fabric.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Data_Architecture"
+              "title": "Outline of Azure_Fabric"
             }
           }
         ],
@@ -179,6 +178,7 @@
   },
   "active": "79a70edfcae63fbd",
   "lastOpenFiles": [
+    "Data_Architecture.md",
     "Azure_Fabric.md",
     "tags/FabricConcepts.md",
     "Delta_table.md",
@@ -188,7 +188,6 @@
     "tags/Architecture & Design.md",
     "tags/Synapse.md",
     "Airflow_notes.md",
-    "Data_Architecture.md",
     "Azure_Authentication_Configuring_Linked_Service.md",
     "tags",
     "Welcome.md",

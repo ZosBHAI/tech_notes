@@ -5,6 +5,9 @@ date: 2025-01-29T00:00:00.000Z
 ---
 # #2Read:
 
+- [Small Data And self service – PowerBI & Fabric and Data in General](https://datamonkeysite.com/page/2/)
+- [#directlake - Microsoft Fabric | Power BI | Data Analytics | Data Science | GenAI](https://fabric.guru/tag/directlake)
+- 
 - https://www.youtube.com/watch?v=U8FxNcerLa0
 -  [ ] https://medium.com/@jacobrnnowjensen/putting-microsoft-fabric-to-the-test-34b7383a9546
 - [ ] [Nice article for  Data Ingestion](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/cloud-scale-analytics/best-practices/automated-ingestion-pattern)
@@ -585,6 +588,38 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 > **Catalog is not Unity Catalog**, but a **meta datastore** for all known tables and views within the SparkSessions.  
 > Known tables can be **Hive tables, Unity Catalog tables, etc.**  
 
+## Fabric Notebook - Concurrency
+ - [Fabric Notebook Concurrency Explained: Update — Advancing Analytics](https://www.advancinganalytics.co.uk/blog/2023/12/13/fabric-notebook-concurrency-explained-whjpa)
+ - With Capacity there is always a QUEUE capacity associated. This QUEUE capacity is only applicable for BATCH jobs. 
+ - From reference link, seems like NOTEBOOK related activities , even if it is triggered from PIPELINE is treated as not BATCH job, but as **Interactive** job.
+ - Degree of Parallelism mean number of concurrent notebook that can be run , it can notebook triggered from **Fabric Pipeline** and **Interactive Notebook** session. If DOP is 6 , it can be 6 notebooks triggered from the Pipeline or it can 4 notebooks triggered from the Pipeline and 2 Spark Session.
+ - Cores Available >= number of nodes * number of cores * DOP
+ -  ### Capacity Calculation example  (F64 Equivalent, 128 cores available)
+		 **Default Starter Pool**
+		 10 nodes  
+		  Node size: Medium (8 vCores per node)  
+		Result: Only 1 notebook can run at once in the default starter pool.  
+			
+		$$
+			
+			DOP = \frac{128}{(10 \times 8)} = \frac{128}{80} = 1.6 \Rightarrow \text{Rounded Down to } 1
+			
+		$$
+		 
+	**Optimized Setup for Higher DOP**
+			To improve concurrency, a custom pool is used with:  
+			2 nodes instead of 10  
+			Small node size (4 vCores per node)  
+	 - Result:** **16 notebooks** can run simultaneously in this optimized setup
+		
+			
+		$$
+			
+			DOP = \frac{128}{(2 \times 4)} = \frac{128}{8} = 16
+			
+		$$
+			
+		
 ## Fabric Notebook - Warehouse Table  
 
 ## Sync Issues Between Warehouse Table and Notebook  
