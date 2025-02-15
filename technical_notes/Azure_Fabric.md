@@ -594,17 +594,15 @@ Mirroring is a data replication method where data is brought to the lakehouse us
  - From reference link, seems like NOTEBOOK related activities , even if it is triggered from PIPELINE is treated as not BATCH job, but as **Interactive** job.
  - Degree of Parallelism mean number of concurrent notebook that can be run , it can notebook triggered from **Fabric Pipeline** and **Interactive Notebook** session. If DOP is 6 , it can be 6 notebooks triggered from the Pipeline or it can 4 notebooks triggered from the Pipeline and 2 Spark Session.
  - Cores Available >= number of nodes * number of cores * DOP
- -  ### Capacity Calculation example  (F64 Equivalent, 128 cores available)
+ -  #### Capacity Calculation example  (F64 Equivalent, 128 cores available)
 		 **Default Starter Pool**
 		 10 nodes  
 		  Node size: Medium (8 vCores per node)  
 		Result: Only 1 notebook can run at once in the default starter pool. 
 			
-	$$
-		
-		DOP = \frac{128}{(10 \times 8)} = \frac{128}{80} = 1.6 \Rightarrow \text{Rounded Down to } 1
-		
-	$$
+	 $$
+	  DOP = \frac{128}{(10 \times 8)} = \frac{128}{80} = 1.6 \Rightarrow \text{Rounded Down to } 1
+	 $$
 		 
 	**Optimized Setup for Higher DOP**
 			To improve concurrency, a custom pool is used with:  
@@ -613,11 +611,9 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 	 - Result:** **16 notebooks** can run simultaneously in this optimized setup
 		
 			
-		$$
-			
-			DOP = \frac{128}{(2 \times 4)} = \frac{128}{8} = 16
-			
-		$$
+	$$
+	 DOP = \frac{128}{(2 \times 4)} = \frac{128}{8} = 16
+	$$
 			
 		
 ## Fabric Notebook - Warehouse Table  
