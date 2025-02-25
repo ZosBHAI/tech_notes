@@ -7,7 +7,7 @@ date: 2025-02-08
 2. You cannot change the database context within a stored procedure using `USE dbName`.  
    - This is because it would be a separate batch, and a stored procedure is a collection of only one batch of statements.
 3. `@` is used to access variables, and `@@` is used to access system variables.
-4. Stored procedure is not Transactional by default . It can be made transactional  by including `BEGIN TRANS` or `COMMIT` or `ROLLBACK`. [SQL SERVER - Stored Procedure and Transactions - SQL Authority with Pinal Dave](https://blog.sqlauthority.com/2010/06/02/sql-server-stored-procedure-and-transactions/)
+4. Stored procedure is not Transactional by default .It can be made transactional  by including `BEGIN TRANS` or `COMMIT` or `ROLLBACK`. [SQL SERVER - Stored Procedure and Transactions - SQL Authority with Pinal Dave](https://blog.sqlauthority.com/2010/06/02/sql-server-stored-procedure-and-transactions/)
 
 ---
 
