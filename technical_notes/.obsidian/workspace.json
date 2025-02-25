@@ -13,8 +13,8 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Azure_Fabric.md",
-                "mode": "preview",
+                "file": "Fabric_SQL_SQL_Server.md",
+                "mode": "source",
                 "source": false,
                 "backlinks": true,
                 "backlinkOpts": {
@@ -28,7 +28,7 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "Azure_Fabric"
+              "title": "Fabric_SQL_SQL_Server"
             }
           }
         ]
@@ -150,13 +150,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Azure_Fabric.md",
+                "file": "Fabric_SQL_SQL_Server.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Azure_Fabric"
+              "title": "Outline of Fabric_SQL_SQL_Server"
             }
           }
         ],
@@ -178,8 +178,8 @@
   },
   "active": "79a70edfcae63fbd",
   "lastOpenFiles": [
-    "Data_Architecture.md",
     "Azure_Fabric.md",
+    "Data_Architecture.md",
     "tags/FabricConcepts.md",
     "Delta_table.md",
     "tags/delta_table_concepts.md",

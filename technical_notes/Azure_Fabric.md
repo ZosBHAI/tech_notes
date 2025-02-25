@@ -593,7 +593,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
  - With Capacity there is always a QUEUE capacity associated. This QUEUE capacity is only applicable for BATCH jobs. 
  - From reference link, seems like NOTEBOOK related activities , even if it is triggered from PIPELINE is treated as not BATCH job, but as **Interactive** job.
  - Degree of Parallelism mean number of concurrent notebook that can be run , it can notebook triggered from **Fabric Pipeline** and **Interactive Notebook** session. If DOP is 6 , it can be 6 notebooks triggered from the Pipeline or it can 4 notebooks triggered from the Pipeline and 2 Spark Session.
- - Cores Available >= number of nodes * number of cores * DOP
+ - ` Cores Available >= number of nodes * number of cores * DOP`
  -  ### Capacity Calculation example  (F64 Equivalent, 128 cores available)
 		 **Default Starter Pool**
 		 10 nodes  

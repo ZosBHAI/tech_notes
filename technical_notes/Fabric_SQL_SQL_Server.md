@@ -7,16 +7,17 @@ date: 2025-02-08
 2. You cannot change the database context within a stored procedure using `USE dbName`.  
    - This is because it would be a separate batch, and a stored procedure is a collection of only one batch of statements.
 3. `@` is used to access variables, and `@@` is used to access system variables.
+4. Stored procedure is not Transactional by default . It can be made transactional  by including `BEGIN TRANS` or `COMMIT` or `ROLLBACK`. [SQL SERVER - Stored Procedure and Transactions - SQL Authority with Pinal Dave](https://blog.sqlauthority.com/2010/06/02/sql-server-stored-procedure-and-transactions/)
 
 ---
 
 ## NVARCHAR vs VARCHAR
 
-1. `NVARCHAR` stores **UNICODE** data. If you need to store UNICODE or multilingual data, `NVARCHAR` is the choice.  
+5. `NVARCHAR` stores **UNICODE** data. If you need to store UNICODE or multilingual data, `NVARCHAR` is the choice.  
    `VARCHAR` stores **ASCII** data and should be used for normal use.  
    - **Example**: A **Name** or **Comment** column should be `NVARCHAR` because you might need to store local names like `'ESKİ'`.
-2. `NVARCHAR` values are always prefixed with `N''`.
-3. `NVARCHAR` requires extra storage, whereas `VARCHAR` only uses **1 byte**.
+6. `NVARCHAR` values are always prefixed with `N''`.
+7. `NVARCHAR` requires extra storage, whereas `VARCHAR` only uses **1 byte**.
 
 ---
 
