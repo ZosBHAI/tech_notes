@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Fabric_SQL_SQL_Server.md",
+                "file": "Azure_Fabric.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -28,7 +28,7 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "Fabric_SQL_SQL_Server"
+              "title": "Azure_Fabric"
             }
           }
         ]
@@ -150,13 +150,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Fabric_SQL_SQL_Server.md",
+                "file": "Azure_Fabric.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Fabric_SQL_SQL_Server"
+              "title": "Outline of Azure_Fabric"
             }
           }
         ],
@@ -178,6 +178,7 @@
   },
   "active": "79a70edfcae63fbd",
   "lastOpenFiles": [
+    "Fabric_SQL_SQL_Server.md",
     "Azure_Fabric.md",
     "Data_Architecture.md",
     "tags/FabricConcepts.md",
@@ -193,7 +194,6 @@
     "Welcome.md",
     "SQL_Programming.md",
     "Spark_Notes.md",
-    "Fabric_SQL_SQL_Server.md",
     "Design_Pattern_Notes.md",
     "DBX_Lakehouse_Architecture.md"
   ]

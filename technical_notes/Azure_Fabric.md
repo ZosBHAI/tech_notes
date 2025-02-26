@@ -7,7 +7,7 @@ date: 2025-01-29T00:00:00.000Z
 
 - [Small Data And self service – PowerBI & Fabric and Data in General](https://datamonkeysite.com/page/2/)
 - [#directlake - Microsoft Fabric | Power BI | Data Analytics | Data Science | GenAI](https://fabric.guru/tag/directlake)
-- 
+- [fabric-samples-healthcare/analytics-bi-directlake-starschema at main · gregbeaumont/fabric-samples-healthcare](https://github.com/gregbeaumont/fabric-samples-healthcare/tree/main/analytics-bi-directlake-starschema)
 - https://www.youtube.com/watch?v=U8FxNcerLa0
 -  [ ] https://medium.com/@jacobrnnowjensen/putting-microsoft-fabric-to-the-test-34b7383a9546
 - [ ] [Nice article for  Data Ingestion](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/cloud-scale-analytics/best-practices/automated-ingestion-pattern)
