@@ -25,6 +25,15 @@ https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-
 - [ ] [Connecting to Warehouse using JDBC](https://milescole.dev/data-engineering/2024/09/27/Another-Way-to-Connect-to-the-SQL-Endpoint.html)
 - [ ] [Service Principal usage for Authentication](https://www.youtube.com/watch?v=_RXpvWjgZE8)
 
+# Medallion  Architecture [[Architecture & Design]]
+#medallion #Architecture 
+1. If there are different persona consuming the data at each layer, say for example  BI user need to access the **SILVER** layer data , Data Scientist for cleansed data in the BRONZE layer; In this scenario  the recommended pattern is to have each layer has a WORKSPACE. [The great "number of workspaces for medallion architecture in Microsoft Fabric" debate - Kevin Chant](https://www.kevinrchant.com/2024/05/03/the-great-number-of-workspaces-for-medallion-architecture-in-microsoft-fabric-debate/)
+2. Security , if your QA data is production grade data then you need to keep them separate.
+3.  Microsoft documentation recommends to save the notebook in a separate workspace. Also when using Deployment pipeline for DEV to higher environment  movement, with increase in number of items it is difficult to select the items, as there is no automated way to identify the changed items (i.e)  from a drop down list items needs to be selected manually.
+>   When we implement DevOps, I do see a lot of suggestions online as well as from Microsoft that we need to have our notebooks in a different workspace than the lakehouse or warehouse. If you want to leverage Deployment Pipelines for Dev, Test, and Prod, having fewer workspaces with more Fabric items can also make the use of Deployment Pipelines more challenging. You can easily reach a point where you have to be very careful about Selective Deployments to ensure that you don’t accidentally publish something to a higher-level environment that is not ready. This only becomes more challenging as you increase the number of developers working in a space.
+---
+
+
 # [[Synapse]]
 + Dedicated SQL Pool - use when you have large scale data warehousing solutions.
 + Serverless SQl Pool - Pricing about the query. For 1 Tb of data it is free; This is applicable  when you  have lot of adhoc query and inconsistent volume.
@@ -44,18 +53,18 @@ https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-
 
 ## Capacity - Billing
 
-1. Tenant - it is tied to an organisation; A tenant can have multiple CAPACITY; A Workspace is tied to a CAPACITY  
-2. Compute + Storage (Similar to ADLS) + Mirroring + Network  
-3. Choose the capacity  
+4. Tenant - it is tied to an organisation; A tenant can have multiple CAPACITY; A Workspace is tied to a CAPACITY  
+5. Compute + Storage (Similar to ADLS) + Mirroring + Network  
+6. Choose the capacity  
 	- Warehouse F64 ~ 32 cores  
 	- Spark Compute ~ 64*2*3  
-4. Except Power BI (as it is completely independent), Fabric capacity is sufficient or free trial for running all the other experiences.  
+7. Except Power BI (as it is completely independent), Fabric capacity is sufficient or free trial for running all the other experiences.  
 	- If you have a POWER BI premium license (P2..P5), then you can enable Fabric Capacity at the TENANT level  
 	- For PPU (Premium per user), you cannot enable the Fabric capacity; You need to purchase FKU  
-5. Capacity - Pay as you go OR Reserved  
+8. Capacity - Pay as you go OR Reserved  
 	- **Pay as You Go** - there is no automatic pause/resume option  
 	- **Reserved** - if you are purchasing 64 SKU and using only 32 SKU, then the remaining 32 SKU is wasted  
-6. Licensing  
+9. Licensing  
 	- Two licenses are needed: one for Capacity License and one for User License  
 	- **User Licensing:**  
 			- F64 >= Needs a developer license but does not need a Viewer license  
@@ -66,7 +75,7 @@ https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-
 
 ### Concept: [[Architecture & Design]]
 #Azure/Fabric #Architecture
-1. If your Workspaces are allocated to a Capacity in the UK and the company is located in the UK, assume a new capacity is allocated in the USA and assigned to a WAREHOUSE, then consider the following:
+10. If your Workspaces are allocated to a Capacity in the UK and the company is located in the UK, assume a new capacity is allocated in the USA and assigned to a WAREHOUSE, then consider the following:
    - This may break data protection law (as data needs to be transferred to WAREHOUSE in the USA, which certain organizations do not adhere to).
    - There could be egress fees across regions (networking cost).
 
@@ -92,10 +101,10 @@ https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-
 - If capacity overutilization is **> 60 mins and < 24 hours**, then interactive requests will be rejected.
 - If capacity overutilization is **> 24 hours**, then nothing is allowed to run (background rejection).
 # Elements [[FabricConcepts]]
-1. Choose the capacity  
-2. Except Power BI (as it is completely independent), Fabric capacity is sufficient or free trial for running all the other experiences.  
-3. Create Workspace pointing to Capacity  
-4. Microsoft has an app called **Microsoft Fabric Capacity Metrics App** to monitor the capacity. It provides an easy plug-and-use experience.  
+11. Choose the capacity  
+12. Except Power BI (as it is completely independent), Fabric capacity is sufficient or free trial for running all the other experiences.  
+13. Create Workspace pointing to Capacity  
+14. Microsoft has an app called **Microsoft Fabric Capacity Metrics App** to monitor the capacity. It provides an easy plug-and-use experience.  
 
 **Reference:** [Is Microsoft Fabric Just a Rebranding?](https://debruyn.dev/2023/is-microsoft-fabric-just-a-rebranding/)  
 
@@ -135,12 +144,12 @@ https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-
 - Spark settings are specific to a **Workspace**.  
 
 ## Spark Pools  
-5. **Starter Pools**  
+15. **Starter Pools**  
    - Machines are pre-warmed in the background, making **session initialization faster**.  
    - Pre-warmed machines are **available** for immediate use.  
    - In a **Starter Pool**, you can change the **number** of machines, but **not** the **size** or **type** of machines.  
 
-6. **Custom Pools**  
+16. **Custom Pools**  
    - Custom Pools **take longer** to initialize (**2-3 minutes**) as they do not have pre-warmed machines.  
    - Recommended **only for development**, where longer cluster spawn times are acceptable.  
    - **Spark session initialization** takes **2-3 minutes** for Custom Pools, but **only seconds** for Starter Pools.  
@@ -177,10 +186,10 @@ https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-
 - Read the full comparison:  
   [SQL Stored Procedures in Fabric Warehouse Offer Blazing Speed and Power at Scale](https://techcommunity.microsoft.com/blog/healthcareandlifesciencesblog/sql-stored-procedures-in-fabric-warehouse-offer-blazing-speed-and-power-at-scale/4287247)  
 # Fabric - Item Level Permission  
-7. **Intent of Item Level Permission**  
+17. **Intent of Item Level Permission**  
    - Allows sharing of items **without providing access** to the **Workspace**.  
 
-8. **Sharing Requirements**  
+18. **Sharing Requirements**  
    - To share an item, you **must have** a **Member-level role**.  
 
 ## Warehouse  
@@ -201,27 +210,27 @@ https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-
 - **ReadAll & Build** → Same as **Warehouse** permissions.  
 
 ## OneLake  
-9. **Currently in Preview Mode**.  
-10. Uses **Role-Based Access Control (RBAC)** to grant access to specific folders.  
-11. **Default Access:**  
+19. **Currently in Preview Mode**.  
+20. Uses **Role-Based Access Control (RBAC)** to grant access to specific folders.  
+21. **Default Access:**  
    - By default, all users have the **DefaultReader** role, allowing them to read all folders.  
-12. **OneLake Shortcuts:**  
+22. **OneLake Shortcuts:**  
    - **Permissions must be defined on the destination table**.  
    - **Defining permissions on the shortcut itself is not allowed**.  
 # Fabric - Row Level Security (RLS)  
 
 ## Key Considerations  
-13. **Applied at the Database Level**  
+23. **Applied at the Database Level**  
    - If a user tries to read data via the **OneLake path**, **RLS will not be enforced**.  
    - To prevent bypassing RLS, **grant only `READDATA` access** to the user.  
 
 ## Steps to Implement RLS  
-14. **Input** → The **USERNAME** of the user.  
-15. **Create a Function**  
+24. **Input** → The **USERNAME** of the user.  
+25. **Create a Function**  
    - Takes **USERNAME** as input.  
    - Defines logic to **restrict records** displayed.  
    - Must include **Schema Binding** when creating the function.  
-16. **Create a Security Policy**  
+26. **Create a Security Policy**  
    - Implement the **security policy** on the table.  
    - Pass the **column name** that should be restricted within the policy.  
 # Fabric - Dynamic Data Masking (DDM)  
@@ -235,10 +244,10 @@ https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-
    - Dynamic Data Masking should be **used alongside Object-Level Security** for better protection.  
 
 ## Steps to Apply Dynamic Data Masking  
-17. **Remove Existing Security Policies**  
+27. **Remove Existing Security Policies**  
    - If there are any **security policies** with **Schema Binding**, they must be **removed** before applying **Dynamic Data Masking**.  
 
-18. **Apply Masking Function**  
+28. **Apply Masking Function**  
    - Use `ALTER` to modify the table and **apply the masking function** to the relevant columns.  
 # Fabric - Column & Object Level Security  
 
@@ -307,39 +316,39 @@ This applies to both **Table** and **File**:
 
 #Fabric - Onelake - Managed Vs External Table
 
-19. Both **Managed** and **External** tables can be created on any file format.
-20. We should attach **Lakehouse** to the notebook if we need to use the **saveTableAs** Spark API.
-21. When you mention **LOCATION** in **CREATE TABLE** or **path** in the **saveTableAs** Spark API, the table will be created as an **External table**.
-22. Both the **External** and **Managed** tables will be available under the **Table section**.
-23. All the **Shortcut** created are like **Managed tables**.
+29. Both **Managed** and **External** tables can be created on any file format.
+30. We should attach **Lakehouse** to the notebook if we need to use the **saveTableAs** Spark API.
+31. When you mention **LOCATION** in **CREATE TABLE** or **path** in the **saveTableAs** Spark API, the table will be created as an **External table**.
+32. Both the **External** and **Managed** tables will be available under the **Table section**.
+33. All the **Shortcut** created are like **Managed tables**.
 ---
 # Fabric - In Relation with Delta Table
 [Delta Lake Interoperability](https://learn.microsoft.com/en-us/fabric/get-started/delta-lake-interoperability)
 [[delta_table_concepts]]
 
 ## Delta Table Column Mapping:
-24. Even in Databricks, this is a preview feature. In MS Fabric, you can create a **Delta table with Column mapping** using Spark Notebooks.
+34. Even in Databricks, this is a preview feature. In MS Fabric, you can create a **Delta table with Column mapping** using Spark Notebooks.
    - Unfortunately, it is not compatible with the **Data Warehouse**. This means it cannot be queried in the Warehouse.
-25. This feature allows us to **rename or drop** columns in a Delta table. By default, you cannot rename or drop a column in a Delta table.
+35. This feature allows us to **rename or drop** columns in a Delta table. By default, you cannot rename or drop a column in a Delta table.
 
 ## Pausing Delta Lake Logs:
-26. If you pause the **Delta Lake logs**, any changes made to the Delta table will **not** be reflected in the Data Warehouse.
+36. If you pause the **Delta Lake logs**, any changes made to the Delta table will **not** be reflected in the Data Warehouse.
    
    **Use Case**:  
    When publishing is paused, Microsoft Fabric engines that read tables outside of the Warehouse see the data as it was before the pause. It ensures that reports remain stable and consistent, reflecting data from all tables as they existed before any changes were made to the tables. Once your data updates are complete, you can resume **Delta Lake Log publishing** to make all recent data changes visible to other analytical engines.
 
 ## Cloning:
-27. Only the **metadata** (such as schema) of the source table is copied, not the underlying Parquet data files. This means the cloned table still references the original Parquet data files in One Lake without duplicating the data files. Cloning is sometimes referred to as a **"Zero Copy Clone"**.
-28. A cloned table is **separate and independent** from its source table.
-29. Any changes made in the source table are **not** reflected in the cloned table and vice-versa.
-30. The clone is based on a **point-in-time** up to thirty days in the past or the current point-in-time. The new table is created with a timestamp based on **UTC**.
+37. Only the **metadata** (such as schema) of the source table is copied, not the underlying Parquet data files. This means the cloned table still references the original Parquet data files in One Lake without duplicating the data files. Cloning is sometimes referred to as a **"Zero Copy Clone"**.
+38. A cloned table is **separate and independent** from its source table.
+39. Any changes made in the source table are **not** reflected in the cloned table and vice-versa.
+40. The clone is based on a **point-in-time** up to thirty days in the past or the current point-in-time. The new table is created with a timestamp based on **UTC**.
 
    **Limitation**:  
    - Table clones across warehouses in a workspace are not currently supported.  
    - Changes to the table schema prevent a clone from being created before the table schema change.
 
 ## Time Travel (Preview Feature):
-31. Similar to the one in **Delta tables**.
+41. Similar to the one in **Delta tables**.
 
    **Limitation**:
    - Supply at most three digits of **fractional seconds** in the timestamp.
@@ -386,18 +395,18 @@ Ref: [Deletion Vectors](https://milescole.dev/data-engineering/2024/11/04/Deleti
 - This feature is useful when we need to identify the kind of operation at the **SOURCE**, based on the **ACTION type**, and decide if we need to perform some logic in the **TARGET**.
 - If the use case is simply **incremental reads**, add a **timestamp column** and read it incrementally.
 ## Restore to Previous Version:
-1) Use this feature when you want to restore data. We can achieve this with a `DELETE` but this is  a file operation. When you use `RESTORE` it is a metadata operation.
-2) To restore a delta table to  previous version, use `TIME TRAVEL` functionality or `RESTORE`
-3) **Time Travel** we use read the previous version using `asOfVersion`, then `overwrite` target table
-4) **Restore** we need to mention version(in this case it is previous version) that needs to be restored.
+42) Use this feature when you want to restore data. We can achieve this with a `DELETE` but this is  a file operation. When you use `RESTORE` it is a metadata operation.
+43) To restore a delta table to  previous version, use `TIME TRAVEL` functionality or `RESTORE`
+44) **Time Travel** we use read the previous version using `asOfVersion`, then `overwrite` target table
+45) **Restore** we need to mention version(in this case it is previous version) that needs to be restored.
 
 **Reference**: [Delta Change Data Feed in Fabric Lakehouses](https://www.serverlesssql.com/delta-change-data-feed-in-fabric-lakehouses/)
 ---
 
 # Fabric - Warehousing [[FabricConcepts]]
 ### Foreign Key:
-5) **Fabric Warehouse** supports **foreign key constraints** but they **can't be enforced**. Therefore, it's important that your **ETL process** tests for integrity between related tables when data is loaded.
-6) It's still a good idea to create **foreign keys**. One good reason to create unenforced foreign keys is to allow **modeling tools**, like **Power BI Desktop**, to automatically detect and create relationships between tables in the semantic model.
+46) **Fabric Warehouse** supports **foreign key constraints** but they **can't be enforced**. Therefore, it's important that your **ETL process** tests for integrity between related tables when data is loaded.
+47) It's still a good idea to create **foreign keys**. One good reason to create unenforced foreign keys is to allow **modeling tools**, like **Power BI Desktop**, to automatically detect and create relationships between tables in the semantic model.
 
 **Reference**: [Dimensional Modeling in Fabric Data Warehouse](https://learn.microsoft.com/en-us/fabric/data-warehouse/dimensional-modeling-dimension-tables)
 
@@ -430,8 +439,8 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 ## Best Practices - Mirroring & Capacity  
 **Reference:** [Fabric Mirroring - Replacing E-ETL](https://www.element61.be/en/resource/fabric-mirroring-replacing-e-etl)  
 
-9. If your source has **frequent changes** and requires **24/7 data availability**, a **dedicated lower-grade capacity** for mirroring may be more cost-effective than using a high-end compute resource.  
-10. If your source has **small, infrequent changes**, consider a separate capacity with scheduled start and pause times to avoid unnecessary costs.  
+48. If your source has **frequent changes** and requires **24/7 data availability**, a **dedicated lower-grade capacity** for mirroring may be more cost-effective than using a high-end compute resource.  
+49. If your source has **small, infrequent changes**, consider a separate capacity with scheduled start and pause times to avoid unnecessary costs.  
    - Capacity start and pause can be managed via **Azure REST APIs**.  
 #Fabric - Warehousing - Data Recovery
 
@@ -442,8 +451,8 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 - There will be **Storage** and **Compute** costs associated with the Restore Point.
 
 ### Limitation:
-11) A **recovery point** can't be restored to create a new warehouse with a different name, either within or across the Microsoft Fabric workspaces.
-12) **Restore points** can't be retained beyond the default **thirty calendar day** retention period. This retention period isn't currently configurable.
+50) A **recovery point** can't be restored to create a new warehouse with a different name, either within or across the Microsoft Fabric workspaces.
+51) **Restore points** can't be retained beyond the default **thirty calendar day** retention period. This retention period isn't currently configurable.
 
 ### Clone Table:
 #Fabric -ALTER
@@ -452,10 +461,10 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 - [The Reality of ALTER Table in Fabric Warehouses](https://www.serverlesssql.com/the-reality-of-alter-table-in-fabric-warehouses-2/)
 
 ### Key Points:
-13) **ALTER Table Usage**:
+52) **ALTER Table Usage**:
    - **Supports adding a column** but **does not support** dropping a column or changing the datatype of a column.
 
-14) **To Add a Column for a Table in the Lakehouse**:
+53) **To Add a Column for a Table in the Lakehouse**:
    - You need to **change the protocol version**. Use the following code:
    
    ```sql
@@ -574,7 +583,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 	  [Reference](https://community.fabric.microsoft.com/t5/Data-Pipeline/Referencing-notebook-exit-value-as-a-variable-in-a-data-pipeline/m-p/3507053)
 
 ## Spark Session  
-2) Shared Spark Session Between Master and Child Notebooks  
+54) Shared Spark Session Between Master and Child Notebooks  
 	- A **Master Notebook** shares its **Spark session** with child notebooks triggered using `mssparkutils.run()`.  
 	- Example:  
 	  ```python
@@ -623,7 +632,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 ## Fabric Notebook - Warehouse Table  
 
 ## Sync Issues Between Warehouse Table and Notebook  
-3. **Data Discrepancy:** There may be a synchronization issue between **Warehouse tables and Notebooks**, leading to:  
+55. **Data Discrepancy:** There may be a synchronization issue between **Warehouse tables and Notebooks**, leading to:  
    - **Count mismatches** when querying data in the notebook versus querying via `SELECT * FROM` in the Lakehouse table.  
    - **Duplicated rows** or **inconsistent results** between Notebook and SQL Endpoint.  
 
@@ -633,7 +642,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 # Fabric SQL - Limitations in Warehouse  
 
 ## Temporary Tables  
-4. **Limited Usage:** Temporary tables are supported but with restrictions:  
+56. **Limited Usage:** Temporary tables are supported but with restrictions:  
    - You **cannot join** a temporary table with a normal table.  
    - `INSERT INTO` with `SELECT * FROM` a normal table **is not supported**.  
    - **Reference:** [Temp Tables in Fabric Warehouses](https://www.serverlesssql.com/temp-tables-in-fabric-warehouses/)  
@@ -644,7 +653,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 ---
 
 # ALTER Statement Limitations  
-5. **Dropping Columns & Changing Datatypes:**  
+57. **Dropping Columns & Changing Datatypes:**  
    - You **cannot drop columns** or **change the datatype** using `ALTER TABLE`.  
    - **Time Travel Functionality is Lost:** When you apply an `ALTER TABLE`, **time travel tracking is reset** to the timestamp of the alteration.  
 
@@ -687,18 +696,34 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 
 ### Solutions for WRITE Conflicts:  
 
-6. **Append-Only Table for Metadata**  
-7. **Monitor Lock & Retry the INSERT** (requires privileged access)  
-8. **In Databricks:**  
+58. **Append-Only Table for Metadata**  
+59. **Monitor Lock & Retry the INSERT** (requires privileged access)  
+60. **In Databricks:**  
    - Handled using **Isolation Levels**  
    - **Partitioning the table**  
 
 # Fabric Warehouse - Performance  
-
+[Warehouse performance guidelines - Microsoft Fabric | Microsoft Learn](https://learn.microsoft.com/en-us/fabric/data-warehouse/guidelines-warehouse-performance)
 ## Automatic Statistics & Caching  
 
-- **Automatic Statistics feature** is available in Fabric.  
-- **Caching is managed automatically** by Fabric, with limited user control.  
+-  **Cold run  (cold cache) performance** - Caching is managed automatically by Fabric, with limited user control.  [Caching with local SSD and memory](https://learn.microsoft.com/en-us/fabric/data-warehouse/caching) is automatic. The first 1-3 executions of a query perform noticeably slower than subsequent executions. If you are experiencing cold run performance issues, then try creating **manual statistics** for the column used in GROUP BY, SORT ,filter condition. However, if the first run's performance is not critical, you can rely on **automatic statistics** that will be generated in the first query and will continue to be leveraged in subsequent runs (so long as underlying data does not change significantly).
+## Group INSERT statements into batches (avoid trickle inserts)
+- Use singleton INSERTS incase if the target table has less than a million or thousand records. But incase of large table ,it is recommended to have INSERTS in a batch.
+  
+## Minimize transaction sizes
+- *INSERT, UPDATE, and DELETE statements run in a transaction. When they fail, they must be rolled back. To reduce the potential for a long rollback, minimize transaction sizes whenever possible. Minimizing transaction sizes can be done by dividing INSERT, UPDATE, and DELETE statements into parts.*
+- If your INSERT is expected to take 1 hour, it  is better to break up the INSERTS into 4 parts.
+- Use CTAS , to write the data you want to keep in a table rather than using DELETE. *If a CTAS takes the same amount of time, it's safer to run since it has minimal transaction logging and can be canceled quickly if needed.*
+## Collocate client applications and Microsoft Fabric
+ - Client application should be in same region as Fabric Warehouse
+ ## Utilize star schema data design
+ ## Choose the best data type for performance
+ - Use integer-based  data types if possible. *SORT, JOIN, and GROUP BY operations complete faster on integers than on character data*
+ - When defining the table, use **smallest data type** that will improve the query performance.*If the **longest value** in a column is **25 characters**, then define your column as **VARCHAR(25)**. Avoid defining all character columns with a large default length.*
+ ## Data Compaction
+ [Announcing: Automatic Data Compaction for Fabric Warehouse | Microsoft Fabric Blog | Microsoft Fabric](https://blog.fabric.microsoft.com/en-US/blog/announcing-automatic-data-compaction-for-fabric-warehouse//)
+ - It is process of merging the smaller parquet file into larger one. This will reduce the number of parquet files , there by improving the read performance.  Also, use Delta Lake feature called Delete Vectors, so that records that are delete are stored in a separate file and during this compaction process, these deleted records are  removed from the main parquet file . Data Compaction is *seamlessly integrated into the warehouse. As queries are executed, the system identifies tables that could benefit from compaction and performs necessary evaluations. There is no manual way to trigger data compaction.*
+ 
 
 ---
 
@@ -724,7 +749,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 > *"V-Order sorting has a 15% impact on average write times but provides up to 50% more compression."*  
 
 #### **How is V-Order enabled?**  
-9. **Automatically enabled by Microsoft Fabric:**  
+61. **Automatically enabled by Microsoft Fabric:**  
    ```sql
    spark.conf.set("spark.microsoft.delta.optimizeWrite.enabled", "true")
    ```
@@ -1030,11 +1055,11 @@ So candidates include flags and indicators, order status, and customer demograph
 - **Refresh the SEMANTIC model** when using IMPORT mode  
 
 ### **Setup Git Integration with Azure DevOps**  
-10. Create a **Project & Repo** in Azure DevOps  
-11. In **Fabric Workspace**, enable **Git Integration**  
+62. Create a **Project & Repo** in Azure DevOps  
+63. In **Fabric Workspace**, enable **Git Integration**  
    - Specify the **Project & Branch**  
    - Ensure the **Azure DevOps account matches** the Fabric workspace user  
-12. **Lock the main branch** using **Branch Policies** (Settings → Branch Policy)  
+64. **Lock the main branch** using **Branch Policies** (Settings → Branch Policy)  
 
 ### **Continuous Integration (CI) in Fabric**  
 - Multiple users can update an object  

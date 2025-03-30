@@ -84,7 +84,8 @@
               "title": "Bookmarks"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -178,10 +179,12 @@
   },
   "active": "79a70edfcae63fbd",
   "lastOpenFiles": [
-    "Fabric_SQL_SQL_Server.md",
-    "Azure_Fabric.md",
-    "Data_Architecture.md",
     "tags/FabricConcepts.md",
+    "Azure_Fabric.md",
+    "DBX_Lakehouse_Architecture.md",
+    "Fabric_SQL_SQL_Server.md",
+    "SQL_Programming.md",
+    "Data_Architecture.md",
     "Delta_table.md",
     "tags/delta_table_concepts.md",
     "2025-02-11.md",
@@ -192,9 +195,7 @@
     "Azure_Authentication_Configuring_Linked_Service.md",
     "tags",
     "Welcome.md",
-    "SQL_Programming.md",
     "Spark_Notes.md",
-    "Design_Pattern_Notes.md",
-    "DBX_Lakehouse_Architecture.md"
+    "Design_Pattern_Notes.md"
   ]
 }

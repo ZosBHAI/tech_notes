@@ -8,16 +8,17 @@ date: 2025-02-08
    - This is because it would be a separate batch, and a stored procedure is a collection of only one batch of statements.
 3. `@` is used to access variables, and `@@` is used to access system variables.
 4. Stored procedure is not Transactional by default .It can be made transactional  by including `BEGIN TRANS` or `COMMIT` or `ROLLBACK`. [SQL SERVER - Stored Procedure and Transactions - SQL Authority with Pinal Dave](https://blog.sqlauthority.com/2010/06/02/sql-server-stored-procedure-and-transactions/)
+5. `@@ERROR` returns `0` if the previous statement  is successfully executed. This will be rested for every statements. So it is better to use `TRY..CATCH` to capture the error in a series of statement.
 
 ---
 
 ## NVARCHAR vs VARCHAR
 
-5. `NVARCHAR` stores **UNICODE** data. If you need to store UNICODE or multilingual data, `NVARCHAR` is the choice.  
+6. `NVARCHAR` stores **UNICODE** data. If you need to store UNICODE or multilingual data, `NVARCHAR` is the choice.  
    `VARCHAR` stores **ASCII** data and should be used for normal use.  
    - **Example**: A **Name** or **Comment** column should be `NVARCHAR` because you might need to store local names like `'ESKİ'`.
-6. `NVARCHAR` values are always prefixed with `N''`.
-7. `NVARCHAR` requires extra storage, whereas `VARCHAR` only uses **1 byte**.
+7. `NVARCHAR` values are always prefixed with `N''`.
+8. `NVARCHAR` requires extra storage, whereas `VARCHAR` only uses **1 byte**.
 
 ---
 
