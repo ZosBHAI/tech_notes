@@ -210,9 +210,10 @@ Hybrid tables combine **Import and DirectQuery partitions**, enabling efficient 
    - Recommended **only for development**, where longer cluster spawn times are acceptable.  
    - **Spark session initialization** takes **2-3 minutes** for Custom Pools, but **only seconds** for Starter Pools.  
 
-## Node Size  
+## Node  
 - Available node sizes: **S, M, L, XL, XXL**  
 - Example: XXL = **64 cores, 512GB RAM**  
+- Rule of thump is that each core is associated with **8GB** of **memory**. For node size that is small, it takes 4 cores and 32GB memory.
 
 ## High Concurrency vs. Standard  
 - **High Concurrency (HC) Mode**  
@@ -235,7 +236,8 @@ Hybrid tables combine **Import and DirectQuery partitions**, enabling efficient 
 
 ## MSSPARKUTIL  
 - **Fastcp**: Uses **underlying AzCOPY**, enabling **fast data transfer**.  
-- Example: **70 million records copied in 20 seconds**.  
+	- Example: **70 million records copied in 20 seconds**.  
+- **RunMultiple**: Using this one all the Notebook can be run under a single cluster . There by avoiding `TooManyRequestForCapacity`
 
 ## Performance: Stored Procedures vs. Notebooks  
 - **Stored Procedures** are observed to be **faster** compared to **Notebooks**.  
