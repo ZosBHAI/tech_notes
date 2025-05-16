@@ -84,8 +84,7 @@
               "title": "Bookmarks"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -179,17 +178,18 @@
   },
   "active": "79a70edfcae63fbd",
   "lastOpenFiles": [
-    "tags/FabricConcepts.md",
+    "tags/Summarize.md",
     "Azure_Fabric.md",
+    "tags/Architecture & Design.md",
+    "tags/FabricConcepts.md",
+    "Data_Architecture.md",
     "DBX_Lakehouse_Architecture.md",
     "Fabric_SQL_SQL_Server.md",
     "SQL_Programming.md",
-    "Data_Architecture.md",
     "Delta_table.md",
     "tags/delta_table_concepts.md",
     "2025-02-11.md",
     "Untitled.canvas",
-    "tags/Architecture & Design.md",
     "tags/Synapse.md",
     "Airflow_notes.md",
     "Azure_Authentication_Configuring_Linked_Service.md",
