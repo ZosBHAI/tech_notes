@@ -739,7 +739,16 @@ Stores the following information:
   - **Duplicates**
 
 ---
-
+## **Datawarehouse**
+### Data Mart
+- Data Mart is a subset of DWH.
+- It is typically built to **serve a specific use case** — a department, region, or a particular tool.
+-  **Cubes** it is used for analytical purposes . Use case is when you have lot of hierarchy 
+### ODS
+- ODS integrate multiple system in an  organization into single database. This data is used for Operational decision-making. It only maintain the current state of the data.
+- Common pattern in Data Architecture when ODS used is , it serves as a **staging layer** for the Data Warehouse.
+- Example, In a financial services company, to evaluate if a customer qualifies for a credit, data from multiple systems (crypto, stocks, ETFs) is combined **in real-time** to get a current view of their balance. This **quick, operational** decision requires an ODS—not a warehouse.
+- Implementation ODS  [Building an Operational Data Store with Kafka and Snowflake | by Vladimir Pasman | Medium](https://medium.com/@vlad-pasman/building-an-operational-data-store-with-kafka-and-snowflake-fac1d7361c81)
 ## **Design Considerations**
 ### **Use Case: Ingesting Oracle Tables to S3**
 1. **Handling Numeric Data Types**:
