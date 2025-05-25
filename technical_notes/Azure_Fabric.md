@@ -1088,6 +1088,20 @@ So candidates include flags and indicators, order status, and customer demograph
 ---
 
 ## Facts  
+#### Basics/**Terminology**
+- **Grain** defines the **most atomic level** of data stored in the table. Example: "Profit by region and by day" → Grain is **one row per region per day**.
+- Fact usually contain **numeric** and **additive** (can be aggregated, e.g., summed up).
+- Facts can be often derived from events or transaction.
+
+### Measures
+- **Fact** measures can be classified based on how they can be aggregated across dimensions in data analytics.
+	- Fully-Additive Facts, means can be added across **all dimensions**.e.g: `Units Sold`, `Revenue`
+	- Semi-Additive Facts, it can be added only few dimensions.eg: `Account balance` it has to be summed up based on the Portfolio, portfolio can be  Cash ,Stocks.
+		-  Can sum across **portfolio types**    
+		-  Cannot sum across **dates**
+	- Non-Additive Facts, cannot be summed across **any dimension**.
+		- **Examples**: `Price per Unit`, `Ratios`, `Percentages`, `Inventory Level`
+		-  Adding up prices or percentages gives **meaningless results**
 
 ### Primary Key  
 - **Fact tables typically do not need a primary key**.  That's because it doesn't typically serve a useful purpose, and it would unnecessarily increase the table storage size.

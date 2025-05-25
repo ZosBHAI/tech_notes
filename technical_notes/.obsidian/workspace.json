@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Data_Architecture.md",
+                "file": "Azure_Fabric.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -28,7 +28,7 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "Data_Architecture"
+              "title": "Azure_Fabric"
             }
           }
         ]
@@ -150,13 +150,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Data_Architecture.md",
+                "file": "Azure_Fabric.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Data_Architecture"
+              "title": "Outline of Azure_Fabric"
             }
           }
         ],
@@ -178,8 +178,8 @@
   },
   "active": "79a70edfcae63fbd",
   "lastOpenFiles": [
-    "Azure_Fabric.md",
     "Data_Architecture.md",
+    "Azure_Fabric.md",
     "DBX_Lakehouse_Architecture.md",
     "Airflow_notes.md",
     "2025-02-11.md",
