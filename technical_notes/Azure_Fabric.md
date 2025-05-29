@@ -997,6 +997,14 @@ Avoid using **Optimize Write** in the following scenarios:
 - Status & error messages.  
 
 ### Surrogate Keys  
+- Natural key Vs Surrogate key
+	- **Artificial** keys created during the **ETL process**
+	- Simple **integer** values (e.g., `1`, `2`, `3`) used as **primary keys (PK)** and **foreign keys (FK)**
+	- Smaller in size , as it is integer→ **better performance** and **storage efficiency**.Help handle **dummy/missing values**.
+- **Practical Guideline**
+	- **Always use surrogate keys** for **primary** and **foreign keys** in both **fact** and **dimension** tables. Except Date dimensions, since the natural key like `YYYYMMDD` since it's consistent and predictable.
+	- You **can optionally keep natural keys** in dimension tables for reference, especially if they are small and useful.
+	- 
 > *Identity columns are not available in Fabric Warehouse.*  
 
 - **Never truncate & fully reload a dimension table** with surrogate keys, as it would invalidate fact table data.  
@@ -1040,14 +1048,31 @@ Avoid using **Optimize Write** in the following scenarios:
 > - When you anticipate fact updates or deletions, you should include attributes in the fact table to help identify the fact rows to modify. Be sure to index these columns to support efficient modification operations.
 
 ## Dimensions  
+### NULL in Dimensions
+- NULL should not be there in the FK
+- **Always replace nulls** in dimension attributes with **descriptive placeholders**:
+	- E.g., “No Promotion Available”, “No Category”, or “Unknown”.
+    - For date dimensions, use a valid placeholder like `1900-01-01`.
+- **Why replace nulls in dimensions?**
+	- Nulls are **ambiguous** and confusing to end users.
+    - Descriptive values improve **clarity and usability** in reports.
+    - BI tools may **ignore nulls** by default in visualizations and groupings, causing misleading results.
 
 ### Handling Hierarchical Structures  
 - **Balanced hierarchy**  
 - **Unbalanced hierarchy (Parent-Child, e.g., Employee-Manager)**
 - In a dimension it is better to transform and store the hierarchy levels in the dimension as columns.  
+- Never normalize hierarchical data by building a Star Schema like pattern. Rather denormalize the data . Include the `product` and `category` in the same table. Create a `single flattened table` combining all the `product` and `categories`.
+- **Create combined attributes for better usability**:
+	- - Examples:    
+	    - `Year_Quarter` = “2023-Q2”
+         - `City_State` = “Nashville, TN”
+	- Especially helpful when:    
+	    - Attribute names are **ambiguous** (e.g., same city name in multiple states).        
+	    - Users want **quick filtering/grouping** in BI tools.
  
   - **If using parent-child relationships in Power BI**, avoid them for large dimensions.  
-  > - **Snip:** If you choose not to naturalize the hierarchy, you can still create a hierarchy based on a parent-child relationship in a Power BI semantic model.However, this approach isn't recommended for large dimensions.
+  > - **Snip:** If you choose not to naturalize the hierarchy, you can still create a hierarchy based on a parent-child relationship in a Power BI semantic model. However, this approach isn't recommended for large dimensions.
 
 ### Managing Historical Change  
 - **SCD Type 1**  
@@ -1072,6 +1097,12 @@ Consolidate small dimensions with low cardinality (e.g., Flags, Indicators, Orde
 So candidates include flags and indicators, order status, and customer demographic states (gender, age group, and others).
 
 ### Degenerate Dimensions  
+- - A **degenerate dimension (DD)** is a **dimension attribute stored directly in the fact table** without a corresponding dimension table.
+    - It typically contains **transaction identifiers** like: 
+	    - **Order ID**        
+	    - **Invoice number**
+		- **Payment ID**
+	- These attributes are useful for grouping, summarizing or aggregation
 - A dimension that exists at the same grain as a fact table (e.g., Sales Order Number).
 > A degenerate dimension can occur when the dimension is at the same grain as the related facts. A common example of a degenerate dimension  is a sales order number dimension that relates to a sales fact table. Typically, the invoice number is a single, non-hierarchical attribute in the fact table. So, it's an accepted practice not to copy this data to create a separate dimension table.
 
@@ -1102,7 +1133,18 @@ So candidates include flags and indicators, order status, and customer demograph
 	- Non-Additive Facts, cannot be summed across **any dimension**.
 		- **Examples**: `Price per Unit`, `Ratios`, `Percentages`, `Inventory Level`
 		-  Adding up prices or percentages gives **meaningless results**
-
+### Nulls in Measures (Fact Values)
+- SQL and BI tools (Power BI, Tableau, etc.) **handle nulls gracefully** during aggregations like `SUM`, `AVG`, `MIN`
+-  While nulls are excluded from aggregates, the **interpretation can be misleading** (e.g., average _per day_ vs. average _when transaction occurred_).
+-  If nulls represent **"zero"**, consider replacing them with `0` to reflect actual absence of activity.
+- Nulls in Foreign Keys (Dimensions)
+	- - **Problematic**: Null foreign keys **break relationships** between fact and dimension tables.
+	- **Solution:** 
+	- Use **dummy keys** (e.g., `999`, `-1`) to indicate special cases like:        
+        - Unknown Portfolio            
+        - Missing Date
+    - Add corresponding **dummy rows in dimension tables** (e.g., Portfolio = "Unknown", Date = "01-Jan-1900").
+ 
 ### Primary Key  
 - **Fact tables typically do not need a primary key**.  That's because it doesn't typically serve a useful purpose, and it would unnecessarily increase the table storage size.
 - Uniqueness is implied by **dimension keys & attributes**.  
@@ -1111,24 +1153,52 @@ So candidates include flags and indicators, order status, and customer demograph
 - Track changes in the fact table.  
 
 ### Types of Fact Tables  
-1️⃣ **Transaction Fact Tables** → Tracks individual transactions.  
+1️⃣ **Transaction Fact Tables** → Tracks individual transactions. 
+	- The **grain** of the table is **one transaction per row**.
+	- Each row includes **Measurements** (e.g., units sold, call duration) and **Foreign keys** linking to dimensions (e.g., product, time, location)
+	-  Example: Sales Transaction, Customer calls
+	
 2️⃣ **Periodic Snapshot Fact Tables** → Stores measurements at predefined intervals.  
    > Example: There might be millions of stock movements in a day (which could be stored in a transaction fact table), but your analysis is only concerned with trends of end-of-day stock levels. 
+   - Often **built on top of transactional tables** through scheduled summarization.
+   - If no events occur in a period, Use **0** if "nothing happened" is meaningful (e.g., 0 sales) **OR** Use **NULL** if the absence should be excluded from calculations (e.g., no business on weekends)
   
 3️⃣ **Accumulating Snapshot Fact Tables** → Captures milestones in a process.  
+### Factless Fact Table  
+- Focus is solely on **capturing events** with dimensions—**no measures** are present.
+- Example: **Product Promotion Tracking**:
+	- Captures: promo code, product, campaign details.
+    - No metrics like sales uplift.
+    -  Useful for tracking **when** and **where** promotions occurred.
+> *Records events/occurrences (e.g., Tracking student participation, Absence tracking, Employee registeration).*  
 
 ### Measure Types  
 - **Semi-additive Measures** → Aggregate across some dimensions but not all (e.g., Account Balance).  
 - **Non-additive Measures** → Cannot be aggregated (e.g., Profit Margin) because summing or averaging profit margins across products is meaningless because it ignores the underlying revenue and profit values 
 
-### Factless Fact Table  
-> *Records events/occurrences (e.g., Tracking student participation, Absence tracking).*  
+
 
 ### Aggregate Fact Tables  
 - Can be pre-aggregated in **Warehouse tables** or **Power BI DirectQuery storage mode**.  
 - Power BI can create **user-defined aggregations** to achieve same result.  
 
 ---
+### Steps to Design a Fact Table
+1. Identify the Business Process
+	1. Determine what process you want to analyze (e.g., **sales**, **order fulfillment**).
+	2. This defines the scope and focus of your fact table.
+2. Define the Grain
+	1. Decide the **level of detail** each row represents. E.g., one row = one transaction, one daily summary per location, etc.
+	2.  **Finer grain (more detail)** is preferred:
+		1.  Keeps analysis flexible.
+		2.  Avoids limitations caused by early aggregations.
+		3.  Allows later aggregation in data marts for specific use cases.
+3. Identify Dimensions
+4. Identify the Facts
+	1.  Determine what **metrics or measures** need to be captured.
+	2. Facts are the **numerical values** used for analysis (e.g., quantity sold, revenue).
+5. 
+______________________
 
 ## Loading Data into Warehouse  
 
@@ -1180,11 +1250,11 @@ So candidates include flags and indicators, order status, and customer demograph
 - **Refresh the SEMANTIC model** when using IMPORT mode  
 
 ### **Setup Git Integration with Azure DevOps**  
-49. Create a **Project & Repo** in Azure DevOps  
-50. In **Fabric Workspace**, enable **Git Integration**  
+6. Create a **Project & Repo** in Azure DevOps  
+7. In **Fabric Workspace**, enable **Git Integration**  
    - Specify the **Project & Branch**  
    - Ensure the **Azure DevOps account matches** the Fabric workspace user  
-51. **Lock the main branch** using **Branch Policies** (Settings → Branch Policy)  
+8. **Lock the main branch** using **Branch Policies** (Settings → Branch Policy)  
 
 ### **Continuous Integration (CI) in Fabric**  
 - Multiple users can update an object  
