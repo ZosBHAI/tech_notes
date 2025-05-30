@@ -36,27 +36,49 @@ date: 2025-01-31
 - [Part 1: Storage and Data Processing](https://www.qubole.com/blog/data-lake-essentials-part-1-storage-and-data-processing/)
 - [Data Lake Ingestion Strategies](https://sbhoracle.wordpress.com/2019/01/13/data-lake-ingestion-strategies/)
 
+## **How to Choose the Right ETL Tool**
+#### **Key Steps in the Evaluation Process**:
 
+1. **Assess Current Needs & Use Cases**    
+    - Identify why an ETL tool is needed (e.g., data integration, automation).        
+    - Define **must-have features** (e.g., specific data source connectors, ease of use).        
+    - Determine who will use the tool (technical vs. business users).
+     
+2. **Create an Evaluation Matrix**    
+    - Compare tools based on criteria such as:        
+        - **Cost & Budget**            
+        - **Available Connectors** (range and compatibility)            
+        - **Ease of Use** (user-friendliness for the team)            
+        - **Additional Capabilities** (e.g., data quality checks, scheduling)          
+         - Assign **importance weights** (e.g., 1-5 scale) to prioritize key factors.
+3. **Research & Reviews**    
+    - Check **customer reviews** and industry reports (e.g., Gartner Magic Quadrant).        
+    - Evaluate **vendor support** (training, dedicated assistance).
+        
+4. **Shortlist & Test**    
+    - Eliminate tools that don’t meet must-have criteria.        
+    - Contact vendors for **demos, trials, or proof-of-concept testing**.        
+    - Test shortlisted tools in real-world scenarios before committing.
 # Bi-Temporal Modelling
 
 🔗 [Bi-Temporal Data Modeling with Envelope](https://blog.cloudera.com/bi-temporal-data-modeling-with-envelope/)
 
 ## Key Takeaways:
-1. **Purpose of Temporal Modeling**  
+5. **Purpose of Temporal Modeling**  
    - Helps **avoid expensive aggregations** when retrieving the latest information.  
    - Efficiently tracks changes in data over time.
 
-2. **Capturing All Changes in Data**  
+6. **Capturing All Changes in Data**  
    - Add **start and end date** at the source.  
    - These dates represent **business time** (not system time).
 
-3. **Solution: SCD Type 2 Table**  
+7. **Solution: SCD Type 2 Table**  
    - Stores **system-generated dates** for each record version.  
    - Enables **rollback to a previous point in time** for historical analysis.
 
 # Infra Provisioning
 
-1. **Auto Scaling Feature**  
+8. **Auto Scaling Feature**  
    - Works only on **ETL workloads** and **SQL Warehouses**.  
    - **Not effective** for **iterative workloads** like **Machine Learning**.
 
@@ -96,17 +118,17 @@ CDC can be implemented as either **PUSH or PULL**, for example, **querying from 
 
 ### Primary CDC Implementation Methods  
 
-1. **Log-Based CDC**  
+9. **Log-Based CDC**  
    - One of the most **efficient** CDC strategies.  
    - Every **new database transaction** is recorded in a **log file**.  
    - The polling system extracts data **without impacting** the source database.  
 
-2. **Query-Based CDC**  
+10. **Query-Based CDC**  
    - The database is **queried** to fetch changes.  
    - Requires **additional metadata** like **timestamps** to track changes.  
    - More **resource-intensive** than log-based CDC.  
 
-3. **Trigger-Based CDC**  
+11. **Trigger-Based CDC**  
    - Uses **database triggers** to notify when data is written or updated.  
    - Relies on **auditing metadata** like timestamps.  
    - **Higher performance impact** due to additional write operations.  
@@ -161,19 +183,19 @@ SCD is primarily used for **data storage and historical tracking** at the **targ
 To comply with regulations, organizations must support the **Right to Forget**—the ability to **delete Personally Identifiable Information (PII)** upon request within a specified period.  
 
 #### **Challenges in Deleting PII from Data Lakes**  
-1. **Identifying User Records:** Requires scanning all data partitions to locate the records containing the user ID.  
-2. **Parquet File Limitations:**  
+12. **Identifying User Records:** Requires scanning all data partitions to locate the records containing the user ID.  
+13. **Parquet File Limitations:**  
    - Cannot delete a **single record** from a **Parquet file**.  
    - Requires **re-writing the entire partition**, which is **time-consuming**.  
 
 #### **Solutions to Overcome These Challenges**  
 
-1. **Avoid Storing PII in the Data Lake** (Recommended)  
+14. **Avoid Storing PII in the Data Lake** (Recommended)  
    - If PII is **not required** for analytics, do not store it.  
    - If PII **must be stored**, use **data masking, hashing, blurring, or random modifications** to **IMPERSONATE** the data.  
    - **Collibra** supports such data protection techniques.  
 
-2. **Implement an Additional Metadata Layer**  
+15. **Implement an Additional Metadata Layer**  
    - Reduces **the number of operations** and **scanning volume** required to find and delete a specific user ID.  
 ---
 # Questions to Consider  
@@ -289,7 +311,7 @@ To comply with regulations, organizations must support the **Right to Forget**�
 
 
 # **Data Publication**  
-1. **DPL Layer (S3)** sends **incremental data to Greenphire**.  
+16. **DPL Layer (S3)** sends **incremental data to Greenphire**.  
    - **Push Mechanism**.  
    - **Custom Lambda code** uses **Greenphire API** for **payment settlement** (logistics, payments, etc.).  
    - **Only incremental data** sent to Greenphire (due to **payload limitations**).  
@@ -388,11 +410,11 @@ To comply with regulations, organizations must support the **Right to Forget**�
 ## **Key Considerations**  
 
 ### **How Do We Identify New Files?**  
-1. **M1: Maintain a Control Table (RDBMS)**
+17. **M1: Maintain a Control Table (RDBMS)**
    - Keeps track of processed files.
    - **Issue:** As the number of files increases, scanning and maintaining the table becomes cumbersome.  
 
-2. **M2: Clean the INBOUND Location After Successful Processing**
+18. **M2: Clean the INBOUND Location After Successful Processing**
    - Only retains unprocessed files.
    - **Issue:** No automatic replay mechanism. To replay, we need to restore all files manually.  
 
@@ -472,9 +494,9 @@ To comply with regulations, organizations must support the **Right to Forget**�
   - If an application fails while reading data, it can restart using the stored cursor.
 
 ### **Anti-Patterns**
-1. **Small Scale Consistent Throughput**  
+19. **Small Scale Consistent Throughput**  
    - Kinesis Data Streams is optimized for large data throughputs, not for streaming at **200 KB/sec or less**.
-2. **Long-Term Data Storage and Analytics**  
+20. **Long-Term Data Storage and Analytics**  
    - By default, **data is retained for 24 hours**, extendable up to **7 days**.
    - Move long-term data to **Amazon S3, Glacier, Redshift, or DynamoDB**.
 
@@ -498,11 +520,11 @@ To comply with regulations, organizations must support the **Right to Forget**�
 - Default **soft limit of 1,000 concurrent executions per account per region**.
 
 ### **Anti-Patterns**
-1. **Long-Running Applications**  
+21. **Long-Running Applications**  
    - Lambda functions **must complete within 900 seconds**.  
    - For long-running tasks, use **EC2 or a chain of Lambda functions**.
-2. **Dynamic Websites**
-3. **Stateful Applications**  
+22. **Dynamic Websites**
+23. **Stateful Applications**  
    - Lambda is stateless. Persistent data should be stored in **S3 or DynamoDB**.
 
 
@@ -528,9 +550,9 @@ To comply with regulations, organizations must support the **Right to Forget**�
 - **Import metadata from Hive Metastore** into AWS Glue Data Catalog.
 
 ### **Anti-Patterns**
-1. **Streaming Data**  
+24. **Streaming Data**  
    - Glue is not suited for streaming. Use **Kinesis for ingestion**, then process with Glue.
-2. **NoSQL Databases**  
+25. **NoSQL Databases**  
    - AWS Glue **does not support NoSQL databases or Amazon DynamoDB**.
 
 
@@ -555,12 +577,12 @@ To comply with regulations, organizations must support the **Right to Forget**�
 - **Data transfer (in/out)**
 
 ### **Anti-Patterns**
-1. **Prewritten applications tied to relational databases**  
+26. **Prewritten applications tied to relational databases**  
    - Use **RDS or EC2** with an installed RDBMS instead.
-2. **Joins or Complex Transactions**
-3. **Binary Large Objects (BLOB) Data**  
+27. **Joins or Complex Transactions**
+28. **Binary Large Objects (BLOB) Data**  
    - Store large files **(400 KB+) in S3** instead.
-4. **Large data with low I/O rate**  
+29. **Large data with low I/O rate**  
    - DynamoDB **uses SSDs**, optimized for high I/O workloads.  
    - For large but infrequently accessed data, **Amazon S3 is a better choice**.
 
@@ -571,14 +593,14 @@ To comply with regulations, organizations must support the **Right to Forget**�
 - **No extra charge** for backup storage **up to 100% of provisioned storage**.
 
 ### **Anti-Patterns**
-1. **Small Datasets**  
+30. **Small Datasets**  
    - Redshift is optimized for **parallel processing** across clusters.
    - If data is **< 100GB**, **RDS is a better option**.
-2. **OLTP (Online Transaction Processing)**
-3. **Unstructured Data**  
+31. **OLTP (Online Transaction Processing)**
+32. **Unstructured Data**  
    - Redshift **requires a defined schema**.
    - **ETL with Amazon EMR** is recommended for structuring data before ingestion.
-4. **BLOB Data**  
+33. **BLOB Data**  
    - Store large binary files in **S3** and reference them in Redshift.
 
 
@@ -593,10 +615,10 @@ To comply with regulations, organizations must support the **Right to Forget**�
 - **Notebook-based analytical solutions** (e.g., **RStudio, Jupyter, Zeppelin**).
 
 ### **Anti-Patterns**
-1. **Enterprise BI & Reporting**  
+34. **Enterprise BI & Reporting**  
    - **Redshift is better** for large-scale **business intelligence workloads**.
-2. **ETL Workloads**
-3. **RDBMS Use Cases**  
+35. **ETL Workloads**
+36. **RDBMS Use Cases**  
    - Athena is **not a transactional database**.
 
 
@@ -624,12 +646,12 @@ To comply with regulations, organizations must support the **Right to Forget**�
 ### **Use Case: Convert CSV/JSON to Parquet for Querying Layer**
 
 #### **Architecture 1:**
-1. **Data Pipeline** → **ECS** (Generates a unique application ID for each file)
-2. **ECS Updates the State Table**:
+37. **Data Pipeline** → **ECS** (Generates a unique application ID for each file)
+38. **ECS Updates the State Table**:
    - Performs **data quality checks**.
    - **Unnests fields**.
    - Stores **last successfully processed partition information**.
-3. **ECS Execution:**
+39. **ECS Execution:**
    - ECS contains a script that **triggers AWS Glue**.
    - Before triggering, a **soft lock** is acquired.
    - After processing, the **lock is released**.
@@ -642,8 +664,8 @@ To comply with regulations, organizations must support the **Right to Forget**�
 ## **Problem 2: Build a User Profile**
 
 ### **Architecture**
-1. **Users Click Stream → Amazon Athena (CTAS) → Consumer Analytics Profile**.
-2. **Data Flow**:
+40. **Users Click Stream → Amazon Athena (CTAS) → Consumer Analytics Profile**.
+41. **Data Flow**:
    - Click Stream → **10-minute intervals** → **S3** → **DynamoDB (Update User Profile)**.
 
 ---
@@ -665,8 +687,8 @@ To comply with regulations, organizations must support the **Right to Forget**�
 
 ## **Key Questions to Ask in Mxxx**
 ### **Data Ingestion Priorities**
-1.  Some it is Data Quality
-2.  Security
+42.  Some it is Data Quality
+43.  Security
 - **Sanity Checks**:
   - Number of records received.
   - Data type validation.
@@ -699,10 +721,10 @@ To comply with regulations, organizations must support the **Right to Forget**�
 
 ### **Metadata Storage**
 Stores the following information:
-1. **Source details & connection parameters**
-2. **State Checkpointing**
-3. **Max records / Processing time**
-4. **Registered transformations**
+44. **Source details & connection parameters**
+45. **State Checkpointing**
+46. **Max records / Processing time**
+47. **Registered transformations**
 
 ### **Spark Ingestion Framework**
 #### **Source Layer**
@@ -751,7 +773,7 @@ Stores the following information:
 - Implementation ODS  [Building an Operational Data Store with Kafka and Snowflake | by Vladimir Pasman | Medium](https://medium.com/@vlad-pasman/building-an-operational-data-store-with-kafka-and-snowflake-fac1d7361c81)
 ## **Design Considerations**
 ### **Use Case: Ingesting Oracle Tables to S3**
-1. **Handling Numeric Data Types**:
+48. **Handling Numeric Data Types**:
    - Example: `NUMERIC(6,2)` in **Oracle** can store `9999.99, -9999.99, 1000, 1`,  
      but in **Spark**, it might display `1.00` when read directly.
    - **Solution 1**: Store as **STRING**.

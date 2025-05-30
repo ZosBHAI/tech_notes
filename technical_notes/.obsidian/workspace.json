@@ -14,13 +14,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Azure_Fabric.md",
+                "file": "Data_Architecture.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "Azure_Fabric"
+              "title": "Data_Architecture"
             },
             "group": "ea8941b9d5d38e9e"
           }
@@ -37,13 +37,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Azure_Fabric.md",
+                "file": "Data_Architecture.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Azure_Fabric"
+              "title": "Outline of Data_Architecture"
             },
             "group": "ea8941b9d5d38e9e"
           }
@@ -140,12 +140,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Azure_Fabric.md",
+                "file": "Data_Architecture.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Azure_Fabric"
+              "title": "Outgoing links from Data_Architecture"
             }
           },
           {
@@ -167,13 +167,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Azure_Fabric.md",
+                "file": "Data_Architecture.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Azure_Fabric"
+              "title": "Outline of Data_Architecture"
             }
           }
         ],
@@ -196,8 +196,8 @@
   },
   "active": "79a70edfcae63fbd",
   "lastOpenFiles": [
-    "Data_Architecture.md",
     "Azure_Fabric.md",
+    "Data_Architecture.md",
     "DBX_Lakehouse_Architecture.md",
     "Airflow_notes.md",
     "2025-02-11.md",
