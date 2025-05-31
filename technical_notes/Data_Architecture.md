@@ -163,7 +163,32 @@ SCD is primarily used for **data storage and historical tracking** at the **targ
 # AWS Data Lakes  
 
 **Reference:** [AWS Data Lake Best Practices](https://docs.aws.amazon.com/whitepapers/latest/best-practices-building-data-lake-for-games/monitoring.html)  
-
+### In-place Querying
+- Directly query data in S3 using 
+- Athena, Redshift Spectrum
+-  **Amazon Athena**
+       - **Serverless** interactive SQL query service        
+    - Supports formats like **CSV, JSON, Parquet, ORC, Avro**        
+    - **Pay-per-query**, based on data scanned        
+    - Ideal for **ad hoc querying and data discovery**
+        
+- **Redshift Spectrum**    
+    - Queries **S3 directly using Redshift SQL**        
+    - Supports **complex queries** and **large user bases**        
+    - Can span queries across **Redshift + S3**        
+    - Optimized and parallelized for performance
+        
+- **Kinesis Data Analytics**    
+    - Use **SQL on streaming data**        
+    - Supports **continuous queries** that output results in real time
+## Cost Optimization for Storage
+ - **S3 Lifecycle Management**
+	 -  Automate storage tier transitions and deletions
+	 - Rules based on object age, tags, or paths
+- S3 Storage Class Analysis
+- Intelligent Tiering
+- Glacier and Glacier Deep Archive
+- Data Formats
 ## Data Catalogue  
 - You can trigger **AWS Glue Crawler** whenever new objects land in **S3** using the following approach:  
   **S3 EVENT → SQS → Glue CRAWLER**  
