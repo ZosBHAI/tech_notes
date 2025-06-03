@@ -18,6 +18,11 @@ date: 2025-01-31
 
 ## Read
 - [Spark Data Pipeline End-to-End](https://medium.com/everything-full-stack/spark-data-pipeline-end-to-end-3154cf95ded7)
+## Data Warehouse
+- [GitHub - lxxxng/sales_data_engineer: End-to-end data warehouse project in SQL Server using Medallion Architecture (Bronze, Silver, Gold). ETL pipeline integrates ERP & CRM CSV data into a star schema for analytics.](https://github.com/lxxxng/sales_data_engineer)
+- [GitHub - TungPhamDuy/azure-data-warehouse-implementation: A comprehensive data warehousing project on Azure, utilizing Azure Synapse Analytics to build a scalable and performant data warehouse. Focuses on star schema design, ELT processes, and optimizing data for business intelligence and analytics on bikeshare data.](https://github.com/TungPhamDuy/azure-data-warehouse-implementation)
+- [GitHub - sidsax23/Dairy-Data-Warehouse: A data warehouse for a milk marketing company akin to Amul with a well-defined STAR Schema, information package diagrams and with business queries implemented on the same.](https://github.com/sidsax23/Dairy-Data-Warehouse/tree/main)
+- 
 
 ## Must Read
 - [Learning Notes on Designing Data-Intensive Applications](https://elfi-y.medium.com/learning-notes-on-designing-data-intensive-applications-vi-f505eec740e7)
@@ -189,12 +194,190 @@ SCD is primarily used for **data storage and historical tracking** at the **targ
 - Intelligent Tiering
 - Glacier and Glacier Deep Archive
 - Data Formats
+## **S3 Encryption Options**
+
+S3 supports **encryption to protect data at rest** or during transmission, using:
+### **1. Server-Side Encryption (SSE)**
+S3 handles encryption **before storing** and decryption **during retrieval**.
+#### a. **SSE-S3 (S3 Managed Keys)**
+- S3 manages encryption keys automatically.    
+- Encryption/decryption is **transparent** to users.    
+- If a bucket is public, **even anonymous users** can access encrypted data.
+#### b. **SSE-KMS (AWS KMS Managed Keys)**
+
+- You manage keys using **AWS Key Management Service (KMS)**.    
+- Access control is stricter — users need:    
+    - Permission to the **S3 bucket** and        
+    - Access to the **KMS key**        
+- Prevents public access even if the bucket is exposed.
+    
+#### c. **SSE-C (Customer-Provided Keys)**
+- The **client provides and manages** the encryption key.    
+- Every request must include the correct key.    
+- If the wrong key is used, access is denied.    
+- Suitable for organizations that **must control key storage**.  
+### **2. Client-Side Encryption**
+
+- Data is encrypted **before uploading to S3**.    
+- S3 stores encrypted data **as-is**.    
+- Encryption/decryption handled **entirely by the client**.    
+- Clients can use **KMS or custom key management systems**.
+## Security and Protection in a Data Lake (S3)
+### **Access Control Mechanisms**
+
+- **User-based policies** (recommended):    
+    - Assigned to users or user groups based on roles.        
+    - Easier to manage with roles and permissions.        
+- **Resource-based policies**:    
+    - Attached directly to S3 buckets or objects.        
+    - Useful for enforcing restrictions (e.g., access only from corporate IPs).        
+- Use **both in combination** for robust access control.
+### **Data Protection Features in S3**
+- **11 9s Durability**:  
+    Data is redundantly stored across multiple **AZs** and devices.    
+- **Versioning**:    
+    - Retains previous versions of objects.        
+    - Allows recovery from accidental overwrites/deletes.        
+- **MFA Delete**:    
+    - Requires multi-factor authentication for delete operations.        
+    - Prevents accidental or malicious deletions.        
+- **Lifecycle Policies**:    
+    - Automatically transition or expire old versions or unused data.
+### **Advanced Data Protection**
+- **Cross-Region Replication (CRR)**:    
+    - Automatically replicates data to a second AWS region for **disaster recovery**.        
+- **Object Tagging**:    
+    - Classify data (e.g., PHI – Protected Health Information).        
+    - Create **tag-based access controls** to restrict sensitive data.
+### Protect Your Data Using Data Perimeters
+#### **Scenario 1: Accessing an Untrusted Resource**
+- **Threat**: Users/applications might unknowingly access an attacker-controlled AWS resource (e.g., misleading S3 bucket names).    
+- **Risk**:    
+    - **Reading**: Malicious files/configurations could infect systems or cause harm.        
+    - **Writing**: Sensitive data could be exfiltrated to an attacker's bucket.        
+- **Solution**:    
+    - Add **conditional checks** in **IAM policies** (e.g., validate account ownership or enforce VPC access).        
+    - **Limitation**: Not scalable across many accounts and policies.        
+    - **Better Approach**: Use **Service Control Policies (SCPs)** for centralized, org-level enforcement.      
+####  **Scenario 2: Untrusted Principal Accessing Your Resource**
+- **Threat**: External (untrusted) accounts access your resource via misconfigured **resource-based policies** (e.g., S3, KMS).    
+- **Risk**: Data lake breaches and large-scale data exposure.    
+- **Limitation**:    
+    - SCPs **do not apply** to external principals or **resource-based policies**.        
+- **Solution**:    
+    - Use **Resource Control Policies (RCPs)** to block access by untrusted external principals.        
+    - RCPs apply organization-wide and complement SCPs.       
+####  **Recommended Approach**
+- Use **SCPs** for internal IAM roles/users.    
+- Use **RCPs** for external principals via resource-based policies.    
+- Combine both for a comprehensive **data perimeter**.    
+- Enforce **VPC endpoint policies/checks** to validate trusted network access.   
+####  **Additional Security Consideration: Confused Deputy Attacks**
+- **Issue**: AWS services acting on your behalf could be misused if not properly scoped.    
+- **Solution**:    
+    - Use conditions like `SourceAccount` and `SourceArn` to ensure AWS service access originates from **your account only**.
+    - 
 ## Data Catalogue  
 - You can trigger **AWS Glue Crawler** whenever new objects land in **S3** using the following approach:  
   **S3 EVENT → SQS → Glue CRAWLER**  
+### Schema Management
+ #### **Why Schema Management Matters**
+- Data structures change over time: columns may be added, removed, renamed, or reordered.    
+- Glue Catalog must stay in sync with these changes to avoid failures in downstream systems like Athena.    
+- The **goal** is to maintain **query stability** and **schema compatibility** to minimize disruption.    
+#### **Tools for Managing Schema Changes**
+- **Glue Crawler**: Automates catalog updates on a schedule.    
+- **Manual Catalog Updates**: Possible alternative to crawlers.    
+- However, **query engines like Athena** may still break or return **incorrect data** if schema issues aren't handled properly.    
+#### **Data Format Matters (Athena Behavior)**
+- Athena accesses data **by index** or **by column name**, depending on the format:    
+    - **CSV/TXT**: Access by **column index** (0-based).        
+    - **ORC**: Access by **index (default)**, but supports name-based too.        
+    - **Parquet**: Default is **name-based**, but index-based is optional.
+        
+#### **Schema Issues with CSV Files**
+Using the **Iris dataset** example, Athena queries can silently fail due to:
+1. **Column Order Changes**:    
+    - Column values may map incorrectly if the order is shuffled.        
+    - Example: Column 0 and 3 are swapped → incorrect attribute values.        
+2. **Missing Columns**:    
+    - Missing columns shift all values left → all mappings are wrong.        
+3. **New Columns in the Middle**:    
+    - Breaks index mapping → Athena reads the wrong column values.        
+4. **New Columns at the End** :    
+    - Safe: Existing queries work correctly, new columns can be ignored.    
+5. **Renaming Columns in the Catalog**:    
+    -  Allowed when using index-based formats like CSV—data remains accessible as mapping is based on position.      
+##### **Best Practices for CSV-Based Data**
+- Maintain consistent **column order**.    
+- Add new columns **only at the end**.    
+- Avoid missing columns.    
+- Test any **data type changes**.    
+- You **can rename** catalog column names (as index-based access allows this).    
+- If you **can’t enforce these constraints**, consider **post-processing or using a better format** (like Parquet/ORC).
+
+#### **Parquet File Handling in Athena**
+
+#####  **Default Access: By Column Name**
+- Athena reads **Parquet files by column name** (not by index, like in CSV).    
+- This makes schema evolution **much easier to manage**.   
+
+##### **Schema Change Scenarios and How Athena Handles Them**
+1. **Shuffled Column Order**  
+     No problem — Athena accesses data by name, so order doesn’t matter.    
+2. **Missing Columns in New Files**  
+     Athena retrieves the existing columns correctly; missing ones are ignored.    
+3. **New Columns Added (Anywhere)**  
+     Handled gracefully — Athena reads known columns; new ones don’t break queries.    
+4. **Renamed Columns in Glue Catalog**  
+     Problem — If the catalog name changes (e.g., adding units), but the file still uses old names, Athena **can’t find** the column and returns **empty values**.   
+##### **Cautions & Considerations**
+- **Don't rename** catalog columns unless the file schema is also updated.    
+- **Data type changes** still require **testing** for compatibility.    
+- You can **enable index-based access** in table config, but it's **not the default**.
 
 
-
+### Organizing Data in S3 for Glue and Athena
+#### **1. File Structure Matters for Querying**
+- **Glue Crawler** can handle complex folder structures and detect different schemas.    
+- **Athena expects similar schema files** in the same S3 path — **don’t mix unrelated data (e.g., employee and movie JSONs) in one folder**.   
+#####  **Best Practice: Organize Data by Schema**
+- Example:    
+    - `s3://bucket/sales/region/` → one schema, one table (partitioned by region)        
+    - `s3://bucket/hr/employee/` and `s3://bucket/hr/training/` → separate folders and separate tables        
+- **Configure crawlers with specific S3 paths**, not the whole bucket.
+#### **2. Data Classification and Security**
+- Use **data classification** (Tier 1 to Tier 3) to guide storage and access:    
+    - Tier 1: Internal use (employee info)        
+    - Tier 2: Business-sensitive (sales data)        
+    - Tier 3: Highly confidential (trade secrets)        
+- **Do not store data of different sensitivity levels in the same folder**.    
+- Use separate **buckets or top-level folders** for each classification.    
+- Follow **least privilege** access control.  
+####  **3. Partitioning for Performance**
+- Improves **query speed** and **reduces costs** in Athena.    
+- Avoids **throughput errors** when querying large datasets.
+ ##### Common Partition Strategies:
+- **By region**: e.g., `/sales/region=US/`    
+- **By time**: e.g., `/sales/year=2024/month=01/`    
+- Use **Hive-style folder names (key=value)** for compatibility.
+#### **4. Maintaining Partitions in Glue Catalog**
+- Athena queries only recognize partitions defined in the **Glue Catalog**.
+- #### Ways to Update Partitions:
+1. **Glue Crawler**    
+    - Can be scheduled (e.g., daily)        
+    - Handles both schema and partition changes        
+    - **Slower**, scans entire structure        
+2. **Athena MSCK REPAIR TABLE**    
+    - Fast, works only with **Hive-style** folders        
+    - Doesn’t work with regular folder names        
+    - Can be triggered by **Lambda**        
+3. **Manual Add/Drop Partition Commands**    
+    - Fastest method        
+    - Requires tracking partition changes manually        
+    - Can also be automated with Lambda 
+##### Schema Drift Prevention
+- **Crawler can enforce a single schema at table level** to prevent drift between table and partitions.
 ## Data Security and Governance  
 
 ### **Data Protection**  
@@ -208,19 +391,19 @@ SCD is primarily used for **data storage and historical tracking** at the **targ
 To comply with regulations, organizations must support the **Right to Forget**—the ability to **delete Personally Identifiable Information (PII)** upon request within a specified period.  
 
 #### **Challenges in Deleting PII from Data Lakes**  
-12. **Identifying User Records:** Requires scanning all data partitions to locate the records containing the user ID.  
-13. **Parquet File Limitations:**  
+4. **Identifying User Records:** Requires scanning all data partitions to locate the records containing the user ID.  
+5. **Parquet File Limitations:**  
    - Cannot delete a **single record** from a **Parquet file**.  
    - Requires **re-writing the entire partition**, which is **time-consuming**.  
 
 #### **Solutions to Overcome These Challenges**  
 
-14. **Avoid Storing PII in the Data Lake** (Recommended)  
+6. **Avoid Storing PII in the Data Lake** (Recommended)  
    - If PII is **not required** for analytics, do not store it.  
    - If PII **must be stored**, use **data masking, hashing, blurring, or random modifications** to **IMPERSONATE** the data.  
    - **Collibra** supports such data protection techniques.  
 
-15. **Implement an Additional Metadata Layer**  
+7. **Implement an Additional Metadata Layer**  
    - Reduces **the number of operations** and **scanning volume** required to find and delete a specific user ID.  
 ---
 # Questions to Consider  
@@ -336,7 +519,7 @@ To comply with regulations, organizations must support the **Right to Forget**�
 
 
 # **Data Publication**  
-16. **DPL Layer (S3)** sends **incremental data to Greenphire**.  
+8. **DPL Layer (S3)** sends **incremental data to Greenphire**.  
    - **Push Mechanism**.  
    - **Custom Lambda code** uses **Greenphire API** for **payment settlement** (logistics, payments, etc.).  
    - **Only incremental data** sent to Greenphire (due to **payload limitations**).  
@@ -435,11 +618,11 @@ To comply with regulations, organizations must support the **Right to Forget**�
 ## **Key Considerations**  
 
 ### **How Do We Identify New Files?**  
-17. **M1: Maintain a Control Table (RDBMS)**
+9. **M1: Maintain a Control Table (RDBMS)**
    - Keeps track of processed files.
    - **Issue:** As the number of files increases, scanning and maintaining the table becomes cumbersome.  
 
-18. **M2: Clean the INBOUND Location After Successful Processing**
+10. **M2: Clean the INBOUND Location After Successful Processing**
    - Only retains unprocessed files.
    - **Issue:** No automatic replay mechanism. To replay, we need to restore all files manually.  
 
@@ -519,9 +702,9 @@ To comply with regulations, organizations must support the **Right to Forget**�
   - If an application fails while reading data, it can restart using the stored cursor.
 
 ### **Anti-Patterns**
-19. **Small Scale Consistent Throughput**  
+11. **Small Scale Consistent Throughput**  
    - Kinesis Data Streams is optimized for large data throughputs, not for streaming at **200 KB/sec or less**.
-20. **Long-Term Data Storage and Analytics**  
+12. **Long-Term Data Storage and Analytics**  
    - By default, **data is retained for 24 hours**, extendable up to **7 days**.
    - Move long-term data to **Amazon S3, Glacier, Redshift, or DynamoDB**.
 
@@ -545,11 +728,11 @@ To comply with regulations, organizations must support the **Right to Forget**�
 - Default **soft limit of 1,000 concurrent executions per account per region**.
 
 ### **Anti-Patterns**
-21. **Long-Running Applications**  
+13. **Long-Running Applications**  
    - Lambda functions **must complete within 900 seconds**.  
    - For long-running tasks, use **EC2 or a chain of Lambda functions**.
-22. **Dynamic Websites**
-23. **Stateful Applications**  
+14. **Dynamic Websites**
+15. **Stateful Applications**  
    - Lambda is stateless. Persistent data should be stored in **S3 or DynamoDB**.
 
 
@@ -575,9 +758,9 @@ To comply with regulations, organizations must support the **Right to Forget**�
 - **Import metadata from Hive Metastore** into AWS Glue Data Catalog.
 
 ### **Anti-Patterns**
-24. **Streaming Data**  
+16. **Streaming Data**  
    - Glue is not suited for streaming. Use **Kinesis for ingestion**, then process with Glue.
-25. **NoSQL Databases**  
+17. **NoSQL Databases**  
    - AWS Glue **does not support NoSQL databases or Amazon DynamoDB**.
 
 
@@ -602,12 +785,12 @@ To comply with regulations, organizations must support the **Right to Forget**�
 - **Data transfer (in/out)**
 
 ### **Anti-Patterns**
-26. **Prewritten applications tied to relational databases**  
+18. **Prewritten applications tied to relational databases**  
    - Use **RDS or EC2** with an installed RDBMS instead.
-27. **Joins or Complex Transactions**
-28. **Binary Large Objects (BLOB) Data**  
+19. **Joins or Complex Transactions**
+20. **Binary Large Objects (BLOB) Data**  
    - Store large files **(400 KB+) in S3** instead.
-29. **Large data with low I/O rate**  
+21. **Large data with low I/O rate**  
    - DynamoDB **uses SSDs**, optimized for high I/O workloads.  
    - For large but infrequently accessed data, **Amazon S3 is a better choice**.
 
@@ -618,14 +801,14 @@ To comply with regulations, organizations must support the **Right to Forget**�
 - **No extra charge** for backup storage **up to 100% of provisioned storage**.
 
 ### **Anti-Patterns**
-30. **Small Datasets**  
+22. **Small Datasets**  
    - Redshift is optimized for **parallel processing** across clusters.
    - If data is **< 100GB**, **RDS is a better option**.
-31. **OLTP (Online Transaction Processing)**
-32. **Unstructured Data**  
+23. **OLTP (Online Transaction Processing)**
+24. **Unstructured Data**  
    - Redshift **requires a defined schema**.
    - **ETL with Amazon EMR** is recommended for structuring data before ingestion.
-33. **BLOB Data**  
+25. **BLOB Data**  
    - Store large binary files in **S3** and reference them in Redshift.
 
 
@@ -640,10 +823,10 @@ To comply with regulations, organizations must support the **Right to Forget**�
 - **Notebook-based analytical solutions** (e.g., **RStudio, Jupyter, Zeppelin**).
 
 ### **Anti-Patterns**
-34. **Enterprise BI & Reporting**  
+26. **Enterprise BI & Reporting**  
    - **Redshift is better** for large-scale **business intelligence workloads**.
-35. **ETL Workloads**
-36. **RDBMS Use Cases**  
+27. **ETL Workloads**
+28. **RDBMS Use Cases**  
    - Athena is **not a transactional database**.
 
 
@@ -671,12 +854,12 @@ To comply with regulations, organizations must support the **Right to Forget**�
 ### **Use Case: Convert CSV/JSON to Parquet for Querying Layer**
 
 #### **Architecture 1:**
-37. **Data Pipeline** → **ECS** (Generates a unique application ID for each file)
-38. **ECS Updates the State Table**:
+29. **Data Pipeline** → **ECS** (Generates a unique application ID for each file)
+30. **ECS Updates the State Table**:
    - Performs **data quality checks**.
    - **Unnests fields**.
    - Stores **last successfully processed partition information**.
-39. **ECS Execution:**
+31. **ECS Execution:**
    - ECS contains a script that **triggers AWS Glue**.
    - Before triggering, a **soft lock** is acquired.
    - After processing, the **lock is released**.
@@ -689,8 +872,8 @@ To comply with regulations, organizations must support the **Right to Forget**�
 ## **Problem 2: Build a User Profile**
 
 ### **Architecture**
-40. **Users Click Stream → Amazon Athena (CTAS) → Consumer Analytics Profile**.
-41. **Data Flow**:
+32. **Users Click Stream → Amazon Athena (CTAS) → Consumer Analytics Profile**.
+33. **Data Flow**:
    - Click Stream → **10-minute intervals** → **S3** → **DynamoDB (Update User Profile)**.
 
 ---
@@ -712,8 +895,8 @@ To comply with regulations, organizations must support the **Right to Forget**�
 
 ## **Key Questions to Ask in Mxxx**
 ### **Data Ingestion Priorities**
-42.  Some it is Data Quality
-43.  Security
+34.  Some it is Data Quality
+35.  Security
 - **Sanity Checks**:
   - Number of records received.
   - Data type validation.
@@ -746,10 +929,10 @@ To comply with regulations, organizations must support the **Right to Forget**�
 
 ### **Metadata Storage**
 Stores the following information:
-44. **Source details & connection parameters**
-45. **State Checkpointing**
-46. **Max records / Processing time**
-47. **Registered transformations**
+36. **Source details & connection parameters**
+37. **State Checkpointing**
+38. **Max records / Processing time**
+39. **Registered transformations**
 
 ### **Spark Ingestion Framework**
 #### **Source Layer**
@@ -798,7 +981,7 @@ Stores the following information:
 - Implementation ODS  [Building an Operational Data Store with Kafka and Snowflake | by Vladimir Pasman | Medium](https://medium.com/@vlad-pasman/building-an-operational-data-store-with-kafka-and-snowflake-fac1d7361c81)
 ## **Design Considerations**
 ### **Use Case: Ingesting Oracle Tables to S3**
-48. **Handling Numeric Data Types**:
+40. **Handling Numeric Data Types**:
    - Example: `NUMERIC(6,2)` in **Oracle** can store `9999.99, -9999.99, 1000, 1`,  
      but in **Spark**, it might display `1.00` when read directly.
    - **Solution 1**: Store as **STRING**.
