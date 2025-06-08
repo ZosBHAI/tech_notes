@@ -333,6 +333,7 @@ Hybrid tables combine **Import and DirectQuery partitions**, enabling efficient 
 10. **Applied at the Database Level**  
    - If a user tries to read data via the **OneLake path**, **RLS will not be enforced**.  
    - To prevent bypassing RLS, **grant only `READDATA` access** to the user.  
+   - There is a risk of information leakage if an attacker writes a query with a specially crafted `WHERE` clause and, for example, a divide-by-zero error, to force an exception if the `WHERE` condition is true. This is known as a _side-channel attack_.
 
 ## Steps to Implement RLS  
 11. **Input** → The **USERNAME** of the user.  
@@ -348,7 +349,7 @@ Hybrid tables combine **Import and DirectQuery partitions**, enabling efficient 
 ## Key Considerations  
 -  **Applied at the Database Level**  
    - Similar to **Row-Level Security (RLS)**, it is enforced at the **database level**.  
-   - Original data can still be accessed using **Spark Notebooks**.  
+   - **Unprivileged users with query permissions** can infer the actual data since the data isn’t physically obfuscated. So, original data can still be accessed using **Spark Notebooks**.  
 
 -  **Combine with Object-Level Security**  
    - Dynamic Data Masking should be **used alongside Object-Level Security** for better protection.  
@@ -524,7 +525,34 @@ Ref: [Deletion Vectors](https://milescole.dev/data-engineering/2024/11/04/Deleti
 
 ## Mirroring  
 Mirroring is a data replication method where data is brought to the lakehouse using CDC (Change Data Capture) incrementally.  
+### **How it works**
+1. **Connect**: Link to an external database via a supported connector.    
+2. **Mirror**: Fabric creates a read-only snapshot that stays synchronized.    
+3. **Query**: Use T-SQL, Spark, or Power BI to analyze the mirrored data.
+### **Types of Mirroring in Microsoft Fabric**
 
+Microsoft Fabric provides **three mirroring approaches** to bring data into **OneLake**, enabling analytics without complex ETL pipelines.
+#### 1. **Database Mirroring**
+- **What it is:** Replicates **entire databases and tables** from source systems into OneLake.    
+- **Purpose:** Consolidates data from multiple systems into a unified analytics platform.    
+- **Example:** Replicating a full Azure SQL Database or SQL Server into Fabric for centralized reporting.  
+
+#### 2. **Metadata Mirroring**
+- **What it is:** Syncs only the **metadata** (catalogs, schemas, tables), not the actual data.    
+- **How it works:** Uses **shortcuts** so the data stays at the source but appears accessible within Fabric.    
+- **Example:** Mirroring metadata from **Azure Databricks** lets you analyze data stored in Databricks without copying it to Fabric.
+#### 3. **Open Mirroring**
+- **What it is:** Allows developers to **write change data directly** into a mirrored database using the **Delta Lake format** and public APIs.    
+- **Use case:** Enables custom or third-party applications to push updates to Fabric seamlessly.    
+- **Example:** A retail app writes transaction updates directly into Fabric using open mirroring.
+### Cost of Mirroring in Microsoft Fabric
+
+| **Aspect**              | **Cost Details**                                                          |
+| ----------------------- | ------------------------------------------------------------------------- |
+| **Storage**             | Free up to 1 TB per CU; billed beyond limit or if capacity is **paused**. |
+| **Replication Compute** | Free (no capacity consumption).                                           |
+| **Query Compute**       | Charged at standard rates (SQL, Spark, Power BI- Direct Lake).            |
+| **Setup Requirement**   | Requires active Fabric capacity **only during initial setup**.            |
 ## Mirroring vs. Shortcut  
 - In **mirroring**, the data is replicated and stored in the lakehouse.  
 - In **shortcut**, the data remains in the source and is not copied to the lakehouse.  
@@ -549,8 +577,8 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 ## Best Practices - Mirroring & Capacity  
 **Reference:** [Fabric Mirroring - Replacing E-ETL](https://www.element61.be/en/resource/fabric-mirroring-replacing-e-etl)  
 
-35. If your source has **frequent changes** and requires **24/7 data availability**, a **dedicated lower-grade capacity** for mirroring may be more cost-effective than using a high-end compute resource.  
-36. If your source has **small, infrequent changes**, consider a separate capacity with scheduled start and pause times to avoid unnecessary costs.  
+4. If your source has **frequent changes** and requires **24/7 data availability**, a **dedicated lower-grade capacity** for mirroring may be more cost-effective than using a high-end compute resource.  
+5. If your source has **small, infrequent changes**, consider a separate capacity with scheduled start and pause times to avoid unnecessary costs.  
    - Capacity start and pause can be managed via **Azure REST APIs**.  
 #Fabric - Warehousing - Data Recovery
 
@@ -561,8 +589,8 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 - There will be **Storage** and **Compute** costs associated with the Restore Point.
 
 ### Limitation:
-37) A **recovery point** can't be restored to create a new warehouse with a different name, either within or across the Microsoft Fabric workspaces.
-38) **Restore points** can't be retained beyond the default **thirty calendar day** retention period. This retention period isn't currently configurable.
+6) A **recovery point** can't be restored to create a new warehouse with a different name, either within or across the Microsoft Fabric workspaces.
+7) **Restore points** can't be retained beyond the default **thirty calendar day** retention period. This retention period isn't currently configurable.
 
 ### Clone Table:
 #Fabric -ALTER
@@ -571,10 +599,10 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 - [The Reality of ALTER Table in Fabric Warehouses](https://www.serverlesssql.com/the-reality-of-alter-table-in-fabric-warehouses-2/)
 
 ### Key Points:
-39) **ALTER Table Usage**:
+8) **ALTER Table Usage**:
    - **Supports adding a column** but **does not support** dropping a column or changing the datatype of a column.
 
-40) **To Add a Column for a Table in the Lakehouse**:
+9) **To Add a Column for a Table in the Lakehouse**:
    - You need to **change the protocol version**. Use the following code:
    
    ```sql
@@ -693,7 +721,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 	  [Reference](https://community.fabric.microsoft.com/t5/Data-Pipeline/Referencing-notebook-exit-value-as-a-variable-in-a-data-pipeline/m-p/3507053)
 
 ## Spark Session  
-41) Shared Spark Session Between Master and Child Notebooks  
+10) Shared Spark Session Between Master and Child Notebooks  
 	- A **Master Notebook** shares its **Spark session** with child notebooks triggered using `mssparkutils.run()`.  
 	- Example:  
 	  ```python
@@ -742,7 +770,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 ## Fabric Notebook - Warehouse Table  
 
 ## Sync Issues Between Warehouse Table and Notebook  
-42. **Data Discrepancy:** There may be a synchronization issue between **Warehouse tables and Notebooks**, leading to:  
+11. **Data Discrepancy:** There may be a synchronization issue between **Warehouse tables and Notebooks**, leading to:  
    - **Count mismatches** when querying data in the notebook versus querying via `SELECT * FROM` in the Lakehouse table.  
    - **Duplicated rows** or **inconsistent results** between Notebook and SQL Endpoint.  
 
@@ -752,7 +780,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 # Fabric SQL - Limitations in Warehouse  
 
 ## Temporary Tables  
-43. **Limited Usage:** Temporary tables are supported but with restrictions:  
+12. **Limited Usage:** Temporary tables are supported but with restrictions:  
    - You **cannot join** a temporary table with a normal table.  
    - `INSERT INTO` with `SELECT * FROM` a normal table **is not supported**.  
    - **Reference:** [Temp Tables in Fabric Warehouses](https://www.serverlesssql.com/temp-tables-in-fabric-warehouses/)  
@@ -763,7 +791,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 ---
 
 # ALTER Statement Limitations  
-44. **Dropping Columns & Changing Datatypes:**  
+13. **Dropping Columns & Changing Datatypes:**  
    - You **cannot drop columns** or **change the datatype** using `ALTER TABLE`.  
    - **Time Travel Functionality is Lost:** When you apply an `ALTER TABLE`, **time travel tracking is reset** to the timestamp of the alteration.  
 
@@ -806,9 +834,9 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 
 ### Solutions for WRITE Conflicts:  
 
-45. **Append-Only Table for Metadata**  
-46. **Monitor Lock & Retry the INSERT** (requires privileged access)  
-47. **In Databricks:**  
+14. **Append-Only Table for Metadata**  
+15. **Monitor Lock & Retry the INSERT** (requires privileged access)  
+16. **In Databricks:**  
    - Handled using **Isolation Levels**  
    - **Partitioning the table**  
 
@@ -859,7 +887,7 @@ Mirroring is a data replication method where data is brought to the lakehouse us
 > *"V-Order sorting has a 15% impact on average write times but provides up to 50% more compression."*  
 
 #### **How is V-Order enabled?**  
-48. **Automatically enabled by Microsoft Fabric:**  
+17. **Automatically enabled by Microsoft Fabric:**  
    ```sql
    spark.conf.set("spark.microsoft.delta.optimizeWrite.enabled", "true")
    ```
@@ -1184,20 +1212,20 @@ So candidates include flags and indicators, order status, and customer demograph
 
 ---
 ### Steps to Design a Fact Table
-1. Identify the Business Process
+18. Identify the Business Process
 	1. Determine what process you want to analyze (e.g., **sales**, **order fulfillment**).
 	2. This defines the scope and focus of your fact table.
-2. Define the Grain
+19. Define the Grain
 	1. Decide the **level of detail** each row represents. E.g., one row = one transaction, one daily summary per location, etc.
 	2.  **Finer grain (more detail)** is preferred:
 		1.  Keeps analysis flexible.
 		2.  Avoids limitations caused by early aggregations.
 		3.  Allows later aggregation in data marts for specific use cases.
-3. Identify Dimensions
-4. Identify the Facts
+20. Identify Dimensions
+21. Identify the Facts
 	1.  Determine what **metrics or measures** need to be captured.
 	2. Facts are the **numerical values** used for analysis (e.g., quantity sold, revenue).
-5. 
+22. 
 ______________________
 
 ## Loading Data into Warehouse  
@@ -1250,11 +1278,11 @@ ______________________
 - **Refresh the SEMANTIC model** when using IMPORT mode  
 
 ### **Setup Git Integration with Azure DevOps**  
-6. Create a **Project & Repo** in Azure DevOps  
-7. In **Fabric Workspace**, enable **Git Integration**  
+23. Create a **Project & Repo** in Azure DevOps  
+24. In **Fabric Workspace**, enable **Git Integration**  
    - Specify the **Project & Branch**  
    - Ensure the **Azure DevOps account matches** the Fabric workspace user  
-8. **Lock the main branch** using **Branch Policies** (Settings → Branch Policy)  
+25. **Lock the main branch** using **Branch Policies** (Settings → Branch Policy)  
 
 ### **Continuous Integration (CI) in Fabric**  
 - Multiple users can update an object  
