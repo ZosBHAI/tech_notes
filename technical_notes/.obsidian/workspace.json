@@ -30,7 +30,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Liquid Clustering.md",
+                "file": "Liquid_Clustering.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -45,7 +45,7 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "Liquid Clustering"
+              "title": "Liquid_Clustering"
             }
           }
         ],
@@ -164,12 +164,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Liquid Clustering.md",
+                "file": "Liquid_Clustering.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Liquid Clustering"
+              "title": "Outgoing links from Liquid_Clustering"
             }
           },
           {
@@ -191,13 +191,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Liquid Clustering.md",
+                "file": "Liquid_Clustering.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Liquid Clustering"
+              "title": "Outline of Liquid_Clustering"
             }
           }
         ],
@@ -221,7 +221,7 @@
   "active": "30e265219571bac2",
   "lastOpenFiles": [
     "tags/delta_table_concepts.md",
-    "Liquid Clustering.md",
+    "Liquid_Clustering.md",
     "DBX_Lakehouse_Architecture.md",
     "Azure_Fabric.md",
     "Design_Pattern_Notes.md",
