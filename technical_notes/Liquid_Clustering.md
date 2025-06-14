@@ -10,133 +10,83 @@ description: "Announced at the 2023 Data + AI Summit [1], Delta Lake liquid clus
 tags:
   - "[[delta_table_concepts]]"
 ---
+## What is Liquid Clustering in Delta Lake?
 
-## Introduction
+Liquid Clustering is a  optimization technique aimed at streamlining data layout in Delta Lake tables. Liquid Clustering logically clusters your data by values in one or more columns — all without changing the table’s physical layout.
+- This feature is available in Delta Lake 3.1.0 and above
+- 
+## How Liquid Clustering works?
+Under the hood, Liquid Clustering organizes your data into what’s effectively a logical sort order during writes. It groups together rows with similar values in the clustering columns. These grouped rows end up stored in the same files or file ranges. Then, when you run queries with filters on those clustered columns, Spark can quickly skip over unrelated data by consulting file-level statistics (like min and max values for each file).
 
-This feature is available in Delta Lake 3.1.0 and above. See [Limitations](https://docs.delta.io/latest/delta-clustering.html#-limitations).
+## LC Vs Hive-style Partitioning Vs  Z-ordering
 
-Announced at the 2023 Data + AI Summit \[[1](https://www.databricks.com/blog/announcing-delta-lake-30-new-universal-format-and-liquid-clustering)\], Delta Lake liquid clustering introduces an innovative optimization technique aimed at streamlining data layout in Delta Lake tables. Its primary goal is to enhance the efficiency of read and write operations while minimizing the need for tuning and data management overhead. Liquid clustering is specifically designed to address the challenges posed by Hive-style partitioning and Z-ordering. It provides a highly adaptive solution, particularly in the context of evolving data patterns, scaling demands, and data skew complexities.
-
-![](https://miro.medium.com/v2/resize:fit:640/format:webp/1*Q7T3A_GDswARU0-RfdZCZw.png)
-
-In this article, we will compare partitioning, Z-ordering, and liquid clustering using a practical dataset example. We will examine the inner workings, strengths, and weaknesses of traditional data-layout methods before contrasting them with the benefits of liquid clustering. Additionally, we will provide examples to guide the reader through the implementation of liquid clustering.
-
-## Background
-
-## Example Dataset
-
-To better illustrate our discussion, we will refer to the following example of a transaction dataset throughout this write-up:
+#### Example Dataset
 
 ![](https://miro.medium.com/v2/resize:fit:640/format:webp/1*ftwCGwGhQU7eIGkGzBnwUA.png)
 
-Example Transaction Dataset
-
-## What is a Data Layout? Why is It Important?
-
-Data layout is the way data is stored in memory or on disk. It is the physical arrangement of the data, which can have a great impact on the performance of the queries and data operations.
-
-A data layout is considered balanced when the data is evenly distributed across the storage medium. In the context of Apache Parquet and Delta Lake \[[2](https://www.databricks.com/glossary/what-is-parquet)\]\[[3](https://docs.databricks.com/en/delta/index.html)\], the goal of optimizing a data layout is to arrive at a uniform file size and an appropriate number of files across a given dataset. A balanced data layout is essential for efficient data skipping during query execution. Data skipping ensures irrelevant data files are ignored and not read into memory for query processing. Data skew and other inconsistencies can lead to suboptimal data skipping, increased execution times, and potential failures in execution.
-
-## Hive-style Partitioning
-
-Hive-style partitioning is a common way to improve the performance of queries on large datasets stored in data lakes \[[4](https://docs.databricks.com/en/sql/language-manual/sql-ref-partition.html)\]. It involves dividing the data into smaller partitions, i.e., sets of files, where the partition information is stored as part of each file’s path (see example below). This technique can help speed up queries significantly by enabling data skipping during scanning.
-
+#### Hive-style Partitioning
+Hive-style partitioning improves query performance on large datasets by organizing data into directory-based partitions.
 ```c
 /transactions/month=2023-1/country=Germany/{1.parquet, 2.parquet,...}
 /transactions/month=2023-2/country=USA/{30.parquet, 31.parquet,...}
 /transactions/month=2023-3/country=Mexico/{53.parquet, 54.parquet,...}
 ...
 ```
-
-Partitioning also comes with a few drawbacks. Storing the partition information as part of the file path introduces physical boundaries between partitions and makes partitioning overall a less flexible, static layout technique. As a result, it can be difficult to manage and update partitions, where a complete rewrite of the data may be necessary.
-
-Partitioning can also lead to data skew, meaning some partitions are much larger than others. Furthermore, partitioning can be effectively applied on low-cardinality fields, i.e., columns with a low number of distinct values (*country* and *month* in our example) \[[5](https://docs.databricks.com/en/tables/partitions.html)\]. Partitioning by high cardinality columns (*transactionId, transactionTime, senderId/recipientId*, etc.) would create many small files that cannot be combined, resulting in poor scan performance.
-
-The following examples demonstrate some of the typical challenges that can arise with partitioning:
-
-1\. ==Some partitions may have small data or no data at all.==
-
-2\. Other partitions may have multiple, large files that should ideally be broken down further.
-
-3\. Yet another group of partitions may each have one smaller file that should be ideally merged across these partitions.
-
-4\. Data may get ingested on a frequent basis, resulting in small, fragmented data files. A background maintenance job needs to be scheduled on a regular basis to optimize these files.
-
-The diagram below illustrates these scenarios. Please note that the number of files is simplified for demonstration and may not be truly representative of an actual transaction dataset.
-
+This structure enables **data skipping**, reducing scan time.
+However, it has **limitations**:
+- It's **rigid and static**, making partition management and updates challenging.    
+- It can cause **data skew**, with some partitions oversized and others nearly empty.    
+- It's only effective on **low-cardinality columns** (e.g., `month`, `country`); high-cardinality fields lead to many small files, degrading performance.   
+**Common issues are :**
+1. Partitions with little or no data.    
+2. Oversized partitions needing further breakdown.    
+3. Multiple small partitions needing file merges.    
+4. Frequent data ingestion creating small, fragmented files—requiring scheduled optimization jobs.
 ![](https://miro.medium.com/v2/resize:fit:640/format:webp/1*u1w9IsT3qmZqnk9NghQ-fA.png)
 
-Partitioning (Example: Unbalanced/Unoptimized Transaction Dataset)
 
-## Z-ordering
+### Z-Ordering 
+**Z-ordering** is a **data-layout optimization** that clusters data within (or across) files to improve **query performance**, especially on **high-cardinality columns** like `senderId`. Unlike partitioning, Z-ordering does **not require** partitions but is often used **in combination** with them to enhance **data skipping**.
+Key concepts:
+- **Z-cube**: A group of clustered files. Once it reaches a size threshold, it becomes **stable** and excluded from future clustering unless modified.    
+- **Unstable Z-cubes** are re-clustered with new data until they stabilize.   
 
-Z-ordering is a data-layout optimization technique that can be used to cluster data within partitions for improved query performance (note that using partitions is not a prerequisite though) \[[6](https://docs.databricks.com/en/delta/data-skipping.html)\]. Z-ordering is recommended to be used on high-cardinality columns. Thus, it is complementary to partitioning. Z-ordering co-locates related data in the same set of files and this co-locality is in turn leveraged to further improve data skipping during scanning.
-
-In order to further explore Z-ordering, we should first review the building block of this clustering method. A Z-cube is a collection of clustered files produced as a result of Z-ordering. Once a Z-cube reaches a certain threshold in size, the cube is considered stable (sealed). This means that a stable Z-cube’s data files are not considered for clustering when the dataset is Z-ordered next time. Furthermore, an unstable Z-cube gets combined and repeatedly re-clustered with newly ingested data files until the Z-cube reaches a stable state.
-
-Although Z-ordering is a highly effective data-clustering technique, the above attributes lead to a few implications:
-
-1. Z-ordering is not idempotent; nevertheless, it aims to be an incremental operation \[[6](https://docs.databricks.com/en/delta/data-skipping.html)\]. Consequently, the time it takes to Z-order is not guaranteed to lessen over multiple runs.
-2. Z-ordering clusters data within partitions and not across partition boundaries.
-3. Stable Z-cubes may still need to be opened up for future clustering when DML operations (merge, update, delete) are performed on existing records.
-4. Query patterns may change over time, requiring a new set of clustering (and partitioning) keys. Applying a new set of keys can be compute-intensive for large datasets.
-
-While the maintenance time of large tables can be significantly reduced by Z-ordering targeted partitions, data management overhead can increase in parallel:
-
+**Implications & Limitations:**
+1. Z-ordering is **not idempotent**; clustering results vary across runs.    
+2. It clusters **within partitions only**, not across them.    
+3. **Stable Z-cubes** may need to be reopened after DML operations.    
+4. Changes in **query patterns** may require re-Z-ordering, which is **compute-intensive**.    
 ```c
 -- Example of Z-ordering in targeted partitions
 OPTIMIZE transactionsTable
 WHERE month >= to_date('2023-02-01')
 ZORDER BY (senderId)
 ```
-
-Revisiting our example of the transaction table, file sizes are optimized and data is co-located by *senderId* within partitions after performing Z-ordering:
-
 ![](https://miro.medium.com/v2/resize:fit:640/format:webp/1*mhKMq2fDDpqHQjxenzEZBQ.png)
+**Conclusion**: Z-ordering complements partitioning but both are **static layout techniques**.
+### LC(Liquid Clustering)
+**Liquid clustering** is a **flexible, adaptive** data layout technique that overcomes the limitations of **Hive partitioning** and **Z-ordering** by:
+- **Removing the need for static partitions**   and  can dynamically merge or further divide files in order to arrive at a balanced dataset with the ideal number and size of files.
+- **Allowing clustering keys to be based purely on query patterns** without concern for cardinality, file size, or skew    
+- **Enabling clustering key changes** without full table rewrites.   
 
-Partitioning plus Z-ordering (Example: Optimized Transaction Dataset)
-
-The combination of partitioning and Z-ordering can overall still be considered a static layout technique. We will see how liquid clustering can overcome the above limitations next.
-
-## How is Liquid Clustering Different?
-
-Unlike Hive partitioning and Z-ordering, liquid clustering keys can be chosen purely based on the query predicate pattern, with no worry about future changes, cardinality, key order, file size, and potential data skew. Liquid clustering is flexible and adaptive (hence, its name), meaning that
-
-1. Clustering keys can be changed without necessarily rebuilding the entire table
-2. It eliminates the concept of partitions and can dynamically merge or further divide files in order to arrive at a balanced dataset with the ideal number and size of files.
-
-Liquid clustering accomplishes the above by leveraging a tree-based algorithm to incrementally map the data layout and maintain the associated metadata as part of the table’s Delta Lake logs. Consequently, liquid clustering is stateful and does not need to be recomputed each time an `OPTIMIZE` command is executed.
-
-This property also makes a truly incremental clustering possible, meaning that newly ingested data gets clustered as necessary — ignoring previously clustered data. Operating on larger blocks compared to Z-ordering also makes table maintenance significantly more efficient. Moreover, cluster-on-write (also called eager clustering) becomes possible following this approach, with clustering performed as part of the ingestion.
-
-Eliminating the need for physical partition boundaries and dynamically merging/dividing data files can dramatically boost data skipping. Persisting the metadata also allows for skew detection and correction as well as better concurrency support at the record rather than partition level.
-
-Revisiting our earlier example of the transaction dataset, liquid clustering provides a much higher degree of flexibility across previous partition boundaries, achieving the desired file size in a more consistent way:
-
+Key features:
+- Supports **stateful, incremental clustering**, only processing newly ingested data .Due to the incremental nature of clustering, table maintenance is computationally cheap and runs in a short time. Downstream processes and users can continue accessing the table simultaneously without an impact due to Delta Lake’s ACID transactions.  
+- Allows **cluster-on-write (also called eager clustering)** becomes possible following this approach, with clustering performed as part of the ingestion.    
+- Improves **data skipping, skew correction**, and **concurrency** at the record level
 ![](https://miro.medium.com/v2/resize:fit:640/format:webp/1*Lr4lfzNGILCxrP1XWf7UYw.png)
 
-Liquid Clustering (Example: Balanced Transaction Dataset)
 
-Databricks recommends liquid clustering for all new Delta tables \[[7](https://docs.databricks.com/en/delta/clustering.html)\]. Based on the above, it can be particularly beneficial for the following scenarios:
 
-- Tables are often filtered by columns with different cardinalities
-- Tables have a significant skew in data distribution
-- Tables grow quickly and require maintenance and tuning effort
-- Tables have concurrent write requirements
-- Tables have access patterns that change over time
-- Tables where a typical partition key could leave the table with too many or too few partitions.
 
-## Benefits
 
-To recap, liquid clustering offers a number of benefits over Hive-style partitioning and Z-ordering:
 
-- **Improved performance**: Liquid clustering can significantly improve the performance of read and write operations on Delta Lake tables. It also provides better concurrency support and is more efficient at data maintenance due to its incremental approach \[[8](https://medium.com/closer-consulting/liquid-clustering-first-impressions-113e2517b251)\].
-- **Easier management**: Liquid clustering is easier to manage and update than partitioning or Z-ordering (see next section for examples). It supports the evolution of clustering keys and reduces the required maintenance on tables.
-- **Reduced data skew and fragmentation**: Liquid clustering can minimize data skew and fragmentation, which can significantly improve query performance.
+
+
 
 ## How to Use It?
 
-To use liquid clustering \[[7](https://docs.databricks.com/en/delta/clustering.html)\], you need to create a Delta Lake table with the `CLUSTER BY` phrase specifying the clustering columns:
+To use liquid clustering, you need to create a Delta Lake table with the `CLUSTER BY` phrase specifying the clustering columns:
 
 ```c
 CREATE TABLE transactions (
@@ -159,7 +109,7 @@ INSERT INTO transactions WHERE country = "Germany"
 SELECT * FROM transactions_staging
 ```
 
-In order to ensure sufficient clustering across the dataset regardless of ingestion size, you can trigger clustering by running `OPTIMIZE` as the following:
+In order to ensure sufficient clustering across the dataset regardless of **ingestion size**, you can trigger clustering by running `OPTIMIZE` as the following:
 
 ```c
 OPTIMIZE transactions
@@ -174,7 +124,15 @@ ALTER TABLE transactions CLUSTER BY (country, month, senderId);
 OPTIMIZE transactions;
 ```
 
-## Current Limitations
+## Current Limitations & Recommendation
+
+Databricks recommends liquid clustering for all new Delta tables \[[7](https://docs.databricks.com/en/delta/clustering.html)\]. Based on the above, it can be particularly beneficial for the following scenarios:
+- Tables are often filtered by columns with different cardinalities
+- Tables have a significant skew in data distribution
+- Tables grow quickly and require maintenance and tuning effort
+- Tables have concurrent write requirements
+- Tables have access patterns that change over time
+- Tables where a typical partition key could leave the table with too many or too few partitions.
 
 As of writing this article, Delta liquid clustering is in Public Preview. The following limitations exist \[[7](https://docs.databricks.com/en/delta/clustering.html)\]:
 
@@ -182,121 +140,14 @@ As of writing this article, Delta liquid clustering is in Public Preview. The fo
 - You can specify up to 4 columns as clustering keys.
 - Structured Streaming workloads do not support clustering-on-write.
 
-## Conclusion
-
-This write-up has compared Hive-style partitioning, Z-ordering, and Delta Lake liquid clustering using a practical example with a transaction dataset. Liquid clustering, an innovative approach to data layout optimization in Delta Lake tables, stands out as a superior option. It offers enhanced efficiency and flexibility compared to Hive-style partitioning and Z-ordering, leading to significant improvements in query performance and data maintenance. In addition, liquid clustering excels in handling data skew and evolving query patterns. Databricks recommends adopting liquid clustering for all new Delta tables.
-
-## References
-
-\[1\] Databricks, [Announcing Delta Lake 3.0 with New Universal Format and Liquid Clustering](https://www.databricks.com/blog/announcing-delta-lake-30-new-universal-format-and-liquid-clustering)
-
-\[2\] Databricks, [What is Parquet?](https://www.databricks.com/glossary/what-is-parquet)
-
-\[3\] Databricks, [What is Delta Lake?](https://docs.databricks.com/en/delta/index.html)
-
-\[4\] Databricks, [Partitions](https://docs.databricks.com/en/sql/language-manual/sql-ref-partition.html)
-
-\[5\] Databricks, [When to partition tables on Databricks](https://docs.databricks.com/en/tables/partitions.html)
-
-\[6\] Databricks, [Data skipping with Z-order indexes for Delta Lake](https://docs.databricks.com/en/delta/data-skipping.html)
-
-\[7\] Databricks, [Use liquid clustering for Delta Table](https://docs.databricks.com/en/delta/clustering.html)
-
-\[8\] Gustavo Martins (Closer Consulting), [Liquid Clustering: First Impressions](https://medium.com/closer-consulting/liquid-clustering-first-impressions-113e2517b251)
-
-\[9\] Databricks, [What are ACID guarantees on Databricks?](https://docs.databricks.com/en/lakehouse/acid.html)
-
-
 ---
-## Introduction to Delta Lake Liquid Clustering
-
-As your Delta tables grow in size, the need for performance tuning in Microsoft Fabric becomes essential. In this post, I’ll explore two powerful optimisation techniques — **Delta Lake Partitioning** and **Liquid Clustering**. Both can help improve query speed and reduce costs, but they work in very different ways.
-
-We’ll break them down, compare them, and help you decide which one fits your scenario best. Earlier, I already wrote about partitioning, so I will focus on liquid clustering today and compare that to partitioning.
-
-## Reminder: What is Delta Lake Partitioning?
-
-[Partitioning](https://thatfabricguy.com/delta-lake-partitioning-for-microsoft-fabric/) is the classic way to optimise large Delta tables. It splits your data physically into subfolders based on one or more columns — often a date or category.
-
-If your query filters on the partitioned columns, only relevant partitions are scanned, which can dramatically speed things up. However, this approach comes with trade-offs that we’ve mentioned in the post on partitioning.
-
-## What is Liquid Clustering in Delta Lake?
-
-Liquid Clustering is a newer, more dynamic approach available in Delta Lake and therefore in Microsoft Fabric. Instead of physically splitting data into folders like traditional partitioning does, Liquid Clustering logically clusters your data by values in one or more columns — all without changing the table’s physical layout.
-
-So what does that mean in practice? Under the hood, Liquid Clustering organises your data into what’s effectively a logical sort order during writes. It groups together rows with similar values in the clustering columns. These grouped rows end up stored in the same files or file ranges. Then, when you run queries with filters on those clustered columns, Spark can quickly skip over unrelated data by consulting file-level statistics (like min and max values for each file).
-
-This behaviour is very similar to Z-Ordering in traditional Delta Lake, but with two big differences: you don’t need to explicitly run a maintenance command like `OPTIMIZE ZORDER BY`, and the clustering is maintained incrementally with each write. In effect, Liquid Clustering creates a kind of soft indexing on your data — it doesn’t guarantee perfect ordering, but it improves data locality, reduces I/O, and allows Spark to prune files much more efficiently at query time.
-
-The result? Faster queries, especially on large tables with high-cardinality filter columns like product IDs, user IDs, or timestamps — and far less engineering effort to maintain it.
-
-## Partitioning vs Liquid Clustering – How They Work Under the Hood
-
-### Storage Layout
-
-Partitioning results in physical folders like `/PickupDate=2025-04-01/`. Clustering, on the other hand, leaves your data in place but adds metadata about how it’s logically grouped.
-
-### Write-Time Complexity
-
-Partitioning must be defined when the table is created. Changing it later involves rewriting the data. Liquid Clustering allows for adjustments without reloading the whole table. This makes maintenance much easier, and I like that!
-
-### Query-Time Optimisation
-
-Both techniques enable data skipping, but the mechanics differ. Partitioning uses folder-based pruning, and Liquid Clustering relies on Spark’s file statistics to skip files. This also implies you need quite large tables before Liquid Clustering starts to make sense. Because if you can compact your delta table into one single parquet file, clustering won’t add any benefits.
-
-### Maintenance Effort
-
-Partitioning requires careful planning and can degrade performance if overused. Liquid Clustering is more forgiving and easier to evolve over time.
-
-## Performance Considerations
-
-We’ve tested both approaches on large datasets — in some cases with billions of rows — and the results may surprise you.
-
-For highly selective filters (e.g. one day’s worth of data), partitioning often wins. But for broader queries or when filter values vary, Liquid Clustering can shine thanks to its adaptive design.
-
-### Querying a Single Partition
-
-Partitioning performs well here. Spark scans only what it needs which is fast and efficient. In the previous post we saw good improvements in read performance for this exact scenario on a very large scale table (± 4 billion rows).
-
-### Querying Across Many Partitions
-
-This is where partitioning can backfire. Reading hundreds of small files adds overhead, whereas Liquid Clustering can streamline the process. We have seen this in the previous post as well, where reading data over multiple partitions actually took longer than the same query on the unpartitioned table.
-
-Liquid clustering has less problems in this scenario, because it doesn’t necessarily split the data into to too many small files. Rather, it keeps the file size in Spark’s optimum, and based on your query, selects the appropriate files it expects the data in.
-
-### Full Table Scans
-
-When scanning all data, partitions add no benefit — and might even slow things down. Clustering keeps things leaner. But even then, I expect not that big of a difference with clustering versus a not optimised table.
-
-## Best Practices for Partitioning
-
-- Use only when your query patterns consistently filter on the partition key.
-- Choose low-cardinality columns (like date or category) to avoid file explosion. And even then, be wary. Keys like data could quickly blow up on tables with lots of history, and if your filters usually are on year and month, partitioning on date won’t do a thing.
-- Avoid partitioning small or medium sized tables because the overhead isn’t worth it. Only the largest tables benefit from partitioning.
-- Once set, changing the partitioning requires rewriting the entire table. This is a major drawback.
-
-## Best Practices for Liquid Clustering
-
-- Use it when queries vary or evolve over time.
-- Apply Liquid Clustering to high-cardinality columns without performance penalties.
-- Also easy to use if you plan on minimising your maintenance efforts.
-- Liquid Clustering can be ideal when working with medium sized tables.
-
-## Can I Use Both?
-
-Absolutely. A hybrid approach is often the sweet spot.
-
-For example, coarse partitioning by year, combined with Liquid Clustering by product or region, can give you the best of both worlds. Just make sure your query patterns align with how your data is structured and clustered.
+## Can I Use Both Partitioning and Liquid Clustering ?
+Absolutely. A hybrid approach is often the sweet spot. For **example**, coarse partitioning by year, combined with Liquid Clustering by product or region, can give you the best of both worlds. Just make sure your query patterns align with how your data is structured and clustered.
 
 ## When to Use Liquid Clustering or Partitioning for Delta Lake?
 
-The choice between these two techniques is largely driven by the factors I’ve mentioned above in this article. But another big factor we haven’t discussed yet is the table size.
-
-As mentioned, the partitioning of small tables is not efficient because of the overhead when reading from multiple small files. Spark prefers larger Parquet files, so too much partitioning doesn’t work that well.
-
+Partitioning of small tables is not efficient because of the overhead when reading from multiple small files. Spark prefers larger Parquet files, so too much partitioning doesn’t work that well.
 The same goes for liquid clustering, where file elimination is triggered based on the metadata of those files. If there are just 1-2 files in a delta table, this will not make sense.
-
-From research, I’ve found the following general guidelines. There is no definitive answer as to which strategy to use for which table size, but when looking at the orders of magnitude you can come to the following guidelines:
 
 | **Table size / row count** | **Optimisation strategy** |
 | --- | --- |
@@ -425,9 +276,9 @@ Is there a way to improve file pruning and query performance here? Automatic Liq
 
 Once enabled, Automatic Liquid Clustering continuously performs the following three steps:
 
-1. Collecting **telemetry** to determine if the table will benefit from introducing or evolving Liquid Clustering Keys.
-2. **Modeling the workload** to understand and identify eligible columns.
-3. **Applying the column selection** and evolving the clustering schemes based on **cost-benefit analysis.**
+11. Collecting **telemetry** to determine if the table will benefit from introducing or evolving Liquid Clustering Keys.
+12. **Modeling the workload** to understand and identify eligible columns.
+13. **Applying the column selection** and evolving the clustering schemes based on **cost-benefit analysis.**
 
 ![Predictive Optimization](https://www.databricks.com/sites/default/files/inline-images/predictive-optimization.png?v=1741200723)
 
@@ -497,13 +348,13 @@ Behind the scenes in automatic liquid clustering,
 
 Once auto clustering is specified at table creation time – “CREATE TABLE my_table CLUSTER BY AUTO”, Delta Lake tracks query patterns and data distributions using metadata. It analyses
 
-1) Frequently filtered columns
+14) Frequently filtered columns
 
-2) Joins
+15) Joins
 
-3) Skewed data
+16) Skewed data
 
-4) Column cardinality.
+17) Column cardinality.
 
 · Automatic Clustering Column selection
 
