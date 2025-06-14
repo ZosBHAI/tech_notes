@@ -95,6 +95,10 @@ https://learn-it-all.medium.com/data-lake-implementation-using-microsoft-fabric-
 	+  If you create database, all are external.
 	+  LDW  store the metadata about the underlying
 	+ You cannot create Table or Materilaized View or Index on the view
++ Fabric Vs Synapse
+	+ Synapse we need to provision cluster then run the query 
+	+ Synapase is Paas, client is responsible for managing the Platform
+	+ Number of nodes provisioned are determined by the end user
 - Why Azure Synapse:[Ref](https://www.youtube.com/watch?v=DL36iVJK8w4) (37:24)
 	  1) Point is integration b/w ADLS and DataWarehouse is seemless
 	  2) Need not worry about the compute, say for example you need a seperate DBricks or HDInsight
@@ -1301,3 +1305,10 @@ ______________________
   - Convert report to **Power BI Project**  
   - Modify using **VS Code**  
   - **Push changes** to Azure DevOps
+### Fabric Administration and Governance
+1) Global Admin - user who can provide access to any service like Fabric, PowerApps
+2) Fabric Admin - user who has full control over the Fabric
+3) PowerBI admin portal is same as Fabric Admin portal
+4) 
+
+
