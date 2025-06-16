@@ -2,11 +2,7 @@
 
 title: "Liquid Clustering: An Innovative Approach to Data Layout in Delta Lake"
 source: "https://medium.com/@stevejvoros/liquid-clustering-an-innovative-approach-to-data-layout-in-delta-lake-1a277f57af99"
-author:
-  - "[[Steve Voros]]"
-published: 2023-09-21
-created: 2025-06-14
-description: "Announced at the 2023 Data + AI Summit [1], Delta Lake liquid clustering introduces an innovative optimization technique aimed at streamlining data layout in Delta Lake tables. Its primary goal is to…"
+"[Delta Lake Liquid Clustering vs Partitioning - That Fabric Guy](https://thatfabricguy.com/delta-lake-liquid-clustering-partitioning/)"
 tags:
   - "[[delta_table_concepts]]"
 ---
@@ -14,7 +10,7 @@ tags:
 
 Liquid Clustering is a  optimization technique aimed at streamlining data layout in Delta Lake tables. Liquid Clustering logically clusters your data by values in one or more columns — all without changing the table’s physical layout.
 - This feature is available in Delta Lake 3.1.0 and above
-- 
+
 ## How Liquid Clustering works?
 Under the hood, Liquid Clustering organizes your data into what’s effectively a logical sort order during writes. It groups together rows with similar values in the clustering columns. These grouped rows end up stored in the same files or file ranges. Then, when you run queries with filters on those clustered columns, Spark can quickly skip over unrelated data by consulting file-level statistics (like min and max values for each file).
 
@@ -115,26 +111,8 @@ ALTER TABLE transactions CLUSTER BY (country, month, senderId);
 OPTIMIZE transactions;
 ```
 
-## Current Limitations & Recommendation
-
-Databricks recommends liquid clustering for all new Delta tables \[[7](https://docs.databricks.com/en/delta/clustering.html)\]. Based on the above, it can be particularly beneficial for the following scenarios:
-- Tables are often filtered by columns with different cardinalities
-- Tables have a significant skew in data distribution
-- Tables grow quickly and require maintenance and tuning effort
-- Tables have concurrent write requirements
-- Tables have access patterns that change over time
-- Tables where a typical partition key could leave the table with too many or too few partitions.
-
-As of writing this article, Delta liquid clustering is in Public Preview. The following limitations exist \[[7](https://docs.databricks.com/en/delta/clustering.html)\]:
-
-- You can only specify columns with statistics collected for clustering keys. By default, the first 32 columns in a Delta table have statistics collected.
-- You can specify up to 4 columns as clustering keys.
-- Structured Streaming workloads do not support clustering-on-write.
-
----
 ## Can I Use Both Partitioning and Liquid Clustering ?
 Absolutely. A hybrid approach is often the sweet spot. For **example**, coarse partitioning by year, combined with Liquid Clustering by product or region, can give you the best of both worlds. Just make sure your query patterns align with how your data is structured and clustered.
-
 ## When to Use Liquid Clustering or Partitioning for Delta Lake?
 
 Partitioning of small tables is not efficient because of the overhead when reading from multiple small files. Spark prefers larger Parquet files, so too much partitioning doesn’t work that well.
@@ -178,13 +156,28 @@ DeltaTable.create(spark) \
     .clusterBy("PickupDate", "TaxiTypeId") \
     .execute()
 ```
-
 ## Maintenance for Liquid Clustering on Delta Tables
 
 Simply running the OPTIMIZE command against your table will trigger the clustering. I usually have a maintenance job that I run once per week, in order to COMPACT, OPTIMIZE and VACUUM my tables.
 
 For tables that are updated very frequently (think multiple times per hour), you might want to experiment with daily maintenance jobs. However, keep in mind that maintenance introduces overhead compute usage.
+## Current Limitations & Recommendation
 
+Databricks recommends liquid clustering for all new Delta tables \[[7](https://docs.databricks.com/en/delta/clustering.html)\]. Based on the above, it can be particularly beneficial for the following scenarios:
+- Tables are often filtered by columns with different cardinalities
+- Tables have a significant skew in data distribution
+- Tables grow quickly and require maintenance and tuning effort
+- Tables have concurrent write requirements
+- Tables have access patterns that change over time
+- Tables where a typical partition key could leave the table with too many or too few partitions.
+
+Limitations:
+
+- You can only specify columns with statistics collected for clustering keys. By default, the first 32 columns in a Delta table have statistics collected.
+- You can specify up to 4 columns as clustering keys.
+- Structured Streaming workloads do not support clustering-on-write.
+
+---
 ## Challenges  with Liquid clustering 
 
 As data volumes and analytics needs grow, collaboration across teams and understanding query behavior becomes increasingly complex—even with Liquid Clustering in place. Data teams need to figure out:
@@ -195,12 +188,13 @@ Moreover, within an organization, data engineers often have to work with multipl
 ## Automatic Liquid Clustering 
 
 With Automatic Liquid Clustering, Databricks **takes care of all data layout-related decisions for you** – from table creation, to clustering your data and evolving your data layout – enabling you to focus on extracting insights from your data.
+- ``Databricks Runtime 15.4+
 #### How to enable it ?
 - Enabled Predictive Optimization , you can do so by selecting Enabled next to Predictive Optimization in the account console under Settings > Feature enablement.
 
 ![Cost-benefit Optimization](https://www.databricks.com/sites/default/files/inline-images/announcing-automatic-liquid-clustering-blog-img-7.png?v=1741166280)
 
-- Then configure your UC managed unpartitioned or Liquid tables by setting the parameter `CLUSTER BY AUTO`.
+- Then configure your **UC managed unpartitioned or Liquid tables** by setting the parameter `CLUSTER BY AUTO`.
 ```
 -- Creating a new table
 CREATE TABLE tbl_name CLUSTER BY AUTO;
@@ -214,7 +208,7 @@ Once enabled, Predictive Optimization analyzes how your tables are queried and *
 Once enabled, Automatic Liquid Clustering continuously performs the following three steps:
 1. Collecting **telemetry**(like **collects and analyzes query scan statistics**, such as query predicates and JOIN filters) to determine if the table will benefit from introducing or evolving Liquid Clustering Keys.
 2. **Modeling the workload** to understand and identify eligible columns. This is done by  learning from past query patterns and estimates the potential performance gains of different clustering schemes. By simulating past queries, it predicts how effectively each option would **reduce the amount of data scanned.**
-3. **Once new clustering key candidates are identified, Predictive Optimization **evaluates whether the performance gains outweigh the costs.** If the benefits are significant, it updates the clustering keys on Unity Catalog managed tables
+3. **Once new clustering key candidates are identified, Predictive Optimization evaluates whether the performance gains outweigh the costs.** If the benefits are significant, it updates the clustering keys on Unity Catalog managed tables
 
 ![Predictive Optimization](https://www.databricks.com/sites/default/files/inline-images/predictive-optimization.png?v=1741200723)
 
