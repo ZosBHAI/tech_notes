@@ -6,6 +6,8 @@ date: 2025-01-29T00:00:00.000Z
 # #2Read:
 
 - [Delta Lake Tables For Optimal Direct Lake Performance In Fabric Python Notebook](https://fabric.guru/delta-lake-tables-for-optimal-direct-lake-performance-in-fabric-python-notebook)
+- [Fabric Semantic Link and Use Cases](https://fabric.guru/fabric-semantic-link-and-use-cases)
+- [My Ramblings On Microsoft Data Stack](https://www.azureguru.net/)
 - [What is Direct Lake mode in Fabric? - Lytix](https://lytix.be/what-is-direct-lake-mode-in-fabric/)
 - [Power BI Direct Lake Mode in Microsoft Fabric - MSSQLTips.com](https://www.mssqltips.com/sqlservertip/7894/power-bi-direct-lake-mode-in-microsoft-fabric/)
 - [Direct Lake overview - Microsoft Fabric | Microsoft Learn](https://learn.microsoft.com/en-us/fabric/fundamentals/direct-lake-overview#known-issues-and-limitations)

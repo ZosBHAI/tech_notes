@@ -4,66 +4,8 @@
     "type": "split",
     "children": [
       {
-        "id": "7870fe9a499b25c2",
-        "type": "tabs",
-        "dimension": 80.09708737864078,
-        "children": [
-          {
-            "id": "79a70edfcae63fbd",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "DBX_Lakehouse_Architecture.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "DBX_Lakehouse_Architecture"
-            },
-            "group": "ea8941b9d5d38e9e"
-          },
-          {
-            "id": "30e265219571bac2",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Liquid_Clustering.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "Liquid_Clustering"
-            }
-          }
-        ],
-        "currentTab": 1
-      },
-      {
         "id": "4ef6ca3b1e6a128c",
         "type": "tabs",
-        "dimension": 19.902912621359224,
         "children": [
           {
             "id": "9af3714e26a2edbb",
@@ -71,17 +13,65 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "DBX_Lakehouse_Architecture.md",
+                "file": "Coursera_Notes_Data_Modelling_PowerBI.md",
                 "followCursor": false,
                 "showSearch": true,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of DBX_Lakehouse_Architecture"
-            },
-            "group": "ea8941b9d5d38e9e"
+              "title": "Outline of Coursera_Notes_Data_Modelling_PowerBI"
+            }
+          },
+          {
+            "id": "14bf4e54d19e296f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Spark_Notes.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "Spark_Notes"
+            }
+          },
+          {
+            "id": "d0fb48056cd8f967",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Coursera_Notes_Data_Modelling_PowerBI.md",
+                "mode": "preview",
+                "source": true,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "Coursera_Notes_Data_Modelling_PowerBI"
+            }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -227,26 +217,27 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "30e265219571bac2",
+  "active": "d0fb48056cd8f967",
   "lastOpenFiles": [
-    "tags/delta_table_concepts.md",
-    "Liquid_Clustering.md",
+    "Data_Architecture.md",
     "DBX_Lakehouse_Architecture.md",
+    "Coursera_Notes_Data_Modelling_PowerBI.md",
+    "Spark_Notes.md",
     "Azure_Fabric.md",
+    "tags/Synapse.md",
+    "Fabric_SQL_SQL_Server.md",
+    "Azure_Authentication_Configuring_Linked_Service.md",
+    "Liquid_Clustering.md",
+    "tags/delta_table_concepts.md",
     "Design_Pattern_Notes.md",
     "SQL_Programming.md",
-    "Azure_Authentication_Configuring_Linked_Service.md",
     "Airflow_notes.md",
-    "Data_Architecture.md",
     "Untitled.canvas",
     "tags/Summarize.md",
     "tags/FabricConcepts.md",
     "tags/Architecture & Design.md",
-    "Fabric_SQL_SQL_Server.md",
     "Delta_table.md",
-    "tags/Synapse.md",
     "tags",
-    "Welcome.md",
-    "Spark_Notes.md"
+    "Welcome.md"
   ]
 }

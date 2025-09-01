@@ -2,7 +2,8 @@
 date: 2025-01-31
 ---
 # Data Engineering Resources
-
+## Usecase on  Real-time 
+[GitHub - tam159/delta-lake-pipeline: Delta lake pipelines in Databricks lakehouse with Spark structured streaming and batching jobs](https://github.com/tam159/delta-lake-pipeline)
 ## Do We Need SCD Type 2 in This Decade?
 - [Functional Data Engineering: A Modern Paradigm for Batch Data Processing](https://maximebeauchemin.medium.com/functional-data-engineering-a-modern-paradigm-for-batch-data-processing-2327ec32c42a)
 - [Lambda and Kappa Architecture with Databricks](https://nileshprajapati.net/blog/2020/lambda-and-kappa-architecture-with-databricks/)
