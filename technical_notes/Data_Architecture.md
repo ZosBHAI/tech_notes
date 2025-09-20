@@ -23,6 +23,8 @@ date: 2025-01-31
 - [GitHub - lxxxng/sales_data_engineer: End-to-end data warehouse project in SQL Server using Medallion Architecture (Bronze, Silver, Gold). ETL pipeline integrates ERP & CRM CSV data into a star schema for analytics.](https://github.com/lxxxng/sales_data_engineer)
 - [GitHub - TungPhamDuy/azure-data-warehouse-implementation: A comprehensive data warehousing project on Azure, utilizing Azure Synapse Analytics to build a scalable and performant data warehouse. Focuses on star schema design, ELT processes, and optimizing data for business intelligence and analytics on bikeshare data.](https://github.com/TungPhamDuy/azure-data-warehouse-implementation)
 - [GitHub - sidsax23/Dairy-Data-Warehouse: A data warehouse for a milk marketing company akin to Amul with a well-defined STAR Schema, information package diagrams and with business queries implemented on the same.](https://github.com/sidsax23/Dairy-Data-Warehouse/tree/main)
+- https://freedium.cfd/https://medium.com/@manoj.panicker.blog/fact-and-dimension-tables-with-pyspark-actual-code-d01b9626814b
+- https://fakhredin.medium.com/data-modeling-with-apache-spark-delta-lake-presto-8663a90ccd1c
 - 
 
 ## Must Read
