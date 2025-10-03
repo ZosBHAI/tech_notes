@@ -9,6 +9,29 @@
             
         - **One-to-Many (or Many-to-One)**: A record in one table relates to multiple in another.  
             _Example_: AdventureWorks lists its stores in table A and its employees in table B. Since each store has multiple employees, that would be a one-to-many relationship.
+          
+			## Example: A Restaurant Management System
+			### Scenario
+			A restaurant needs to manage its employees and the orders they take from customers.
+			### Tables
+			- **Table A (Employees)**: Contains records of all employees. Each employee has a unique **Employee ID**.  
+			- **Table B (Orders)**: Contains all customer orders. Each order has a unique **Order ID** and is linked to the **Employee ID** of the employee who took the order.  
+			### Relationship
+			**One-to-Many Relationship**:  
+			- One employee (from Table A) can take many orders (in Table B).  
+			- Each order is associated with only one employee.  
+			
+			### Relevance to the Learner
+			1. **Understanding Relationships**  
+			   - Helps organize data effectively.  
+			   - In a restaurant management system, linking employees to orders is crucial for performance tracking and customer service.  
+			2. **Data Analysis**  
+			   - Example questions the system can answer:  
+				 - Which employee took the most orders in a week?  
+				 - What is the average number of orders per employee?  
+				 - How can service be improved based on employee performance?  
+
+
             
         - **Many-to-Many**: Records in both tables map to multiple records in each other.  
             _Example_: The AdventureWorks dataset contains two main tables, one for products and another for salespeople. Each salesperson can sell more than one type of bike, and each type of bike can be sold by more than one salesperson. For example, salesperson A might sell mountain bikes, while salesperson B might also sell mountain bikes in addition to road bikes.
