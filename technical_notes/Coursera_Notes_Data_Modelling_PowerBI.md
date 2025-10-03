@@ -9,8 +9,7 @@
             
         - **One-to-Many (or Many-to-One)**: A record in one table relates to multiple in another.  
             _Example_: AdventureWorks lists its stores in table A and its employees in table B. Since each store has multiple employees, that would be a one-to-many relationship.
-          
-			## Example: A Restaurant Management System
+  			## Example: A Restaurant Management System
 			### Scenario
 			A restaurant needs to manage its employees and the orders they take from customers.
 			### Tables
