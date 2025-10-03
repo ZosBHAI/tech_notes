@@ -41,6 +41,31 @@
     - this should align with business question you need to answer
     -  _Example of high granularity_: Customer purchase history with detailed transaction data, or sales data at the level of continents, countries, states, cities, and even individual stores.    
 	- _Example of low granularity_: Monthly sales of a product category summarized only on a monthly basis, or the total sales of all the stores combined.
+	 - ### Questions to Identify Granularity
+		- **What is the primary objective of the analysis?**  
+	    	- Are you identifying trends, understanding customer behavior, or evaluating product performance?
+	
+		- **What specific questions need to be answered?**  
+		  - For example: total sales for a month vs. sales for each transaction.
+		
+		- **What level of detail is necessary?**  
+		  - Do you need detailed transaction data or is aggregated data sufficient?
+		
+		- **Who is the audience for the analysis?**  
+		  - Management, stakeholders, or technical teams may need different levels of detail.
+		
+		- **What data is available and how is it structured?**  
+		  - Collected at a high level (e.g., monthly sales) or detailed (e.g., individual transactions)?
+		
+		- **What are the challenges of using high granularity data?**  
+		  - Consider processing speed, storage requirements, and analysis complexity.
+		
+		- **How will granularity impact insights?**  
+		  - Will more detail provide actionable insights or cause information overload?
+		
+		- **Are there industry standards or benchmarks to consider?**  
+		  - Some industries have standard practices for reporting and analysis.  
+
         
 - **Schemas:**    
 	- **Flat Schema**: Stores all attributes in a single table. Simple and easy to query but leads to redundancy, large datasets, and slower performance. Suitable only for small datasets.
@@ -110,6 +135,30 @@
 	- DAX is not case-sensitive, but it does distinguish between blanks and zeros.    
 	- Use comments to explain your code. You can use // for a single-line comment and /* ... */ for a multi-line comment. These comments do not affect the functionality of the function or formula. They do, however, help other team members understand your code and can later serve as a reminder of your thinking.    
 	- Remember, many DAX functions require an **existing relationship between tables**, so ensure your data model is set up correctly.
+    - ### DAX vs SQL
+		- **DAX**: Best for interactive data analysis and reporting within tools like Power BI.  
+		- **SQL**: Best for database management, data manipulation, and querying raw data.  
+		#### Advantages of Using DAX Over SQL in Reporting
+		1. **Dynamic Calculations**  
+		   - Automatically update with user interactions (filters, slicers) in reports and dashboards.  
+		2. **Time Intelligence**  
+		   - Built-in functions for date calculations: YTD, QTD, and period comparisons.  
+		   - Especially useful for financial reporting.  
+		3. **Data Model Integration**  
+		   - Works seamlessly with Power BI and Power Pivot data models.  
+		   - Leverages relationships between tables for context-aware calculations.  
+		4. **Calculated Columns and Measures**  
+		   - Create calculations directly in the data model.  
+		   - Reuse across multiple reports without altering underlying data.  
+		5. **Performance Optimization**  
+		   - Optimized for in-memory analytics in Power BI.  
+		   - Efficiently handles aggregations and large datasets.  
+		6. **User-Friendly Syntax**  
+		   - Similar to Excel formulas, lowering the learning curve for analysts.  
+		7. **Visualizations**  
+		   - Integrates tightly with Power BI visuals.  
+		   - Enables rich, interactive reporting driven by DAX calculations.  
+ 
 	- **Row Context**:
 		- Refers to the **current row being evaluated** in a table.    
 		- Used in calculated columns where formulas iterate row by row.
@@ -118,6 +167,7 @@
 		- Refers to the **set of filters applied** to the data before evaluation.
 		-  Example: calculating total sales only for products in category **X** or restricting sales to a specific region.    
 		- Filters can be combined (logical AND) and **automatically propagate** across table relationships depending on cross-filter direction.
+        - Row and filter contexts interact during evaluation, with **filter context applied first**, followed by row context
 	- ## 1. **Row Context Example**
 		**Scenario**: Calculate _Total Sales per row_ in the **Sales** table.
 		**Formula (Calculated Column):**
@@ -132,22 +182,68 @@
 		 **Scenario**: Calculate _Total Sales across the entire dataset_.
 		**Formula (Measure):**
 		`Total Sales = SUM(Sales[Quantity] * Sales[Unit Price])`
-		**Explanation:**
+		- **Explanation:**
 			- This is a **measure**, not a column.    
 			- The result depends on the **filters applied**.    
 			- If you place this measure in a visual filtered by `Product Category = Bikes`, the calculation only includes bike sales.        
 			- Here, **Filter Context** comes from slicers, rows, columns, or filters applied in Power BI visuals.
-	- ## Measures
-	- **What are Measures?**    
-	    - Smart, real-time calculations created with DAX.        
-	    - Perform tasks like totals, averages, counts, and advanced calculations.        
-	    - Automatically adapt to filters and report interactions. 
-	    - Useful for creating **Calculated Tables**.
-	- **Benefits of Measures:**    
-	    1. **Dynamic** – update automatically based on filters/visual context.        
-	    2. **Reusable** – one measure can be used across multiple reports/visuals.        
-	    3. **Performance Tracking** – essential for creating KPIs.        
-	    4. **Consistency** – standardized calculations ensure reliable results.
+   
+	   - **Importance of Filter Context in DAX**
+		 If filter context is ignored in DAX calculations, several issues can occur:
+			1. **Incorrect Results**  
+				   - Calculations may include unintended data.  
+				   - Example: A formula for total sales by category could return all sales instead.  
+			2. **Lack of Specificity**  
+				   - Expressions may evaluate against the entire dataset.  
+				   - Results become too general and fail to answer specific business questions.  
+			3. **Performance Issues**  
+				   - Processing large datasets without filters slows performance.  
+				   - More data is handled than necessary.
+       - ## Calculated tables:
+       - Calculated tables are useful in Power BI for enhancing data analysis. Key scenarios include:
+
+			1. **Combining Data from Different Sources**  
+			   - Merge datasets from multiple sources (e.g., customer data in a database and sales data in Excel).  
+			   - Enables analysis of relationships between sales and customer demographics.
+			
+			2. **Creating Summaries**  
+			   - Aggregate data for reporting, such as annual sales summaries.  
+			   - Example: Total sales per product category for a specific year.
+			
+			3. **Normalizing Data**  
+			   - Simplify complex datasets by splitting tables into multiple dimensions.  
+			   - Example: Split a product dimension into category and subcategory tables.
+			
+			4. **Enhancing Data Models**  
+			   - Add new dimensions or metrics to existing models for tailored insights.  
+			   - Improves the overall effectiveness of data analysis.
+			
+			5. **Testing Hypotheses**  
+			   - Create calculated tables to experiment with different calculations or filters.  
+			   - Explore scenarios without altering the original data. 
+	    - ## Calculated Columns in Power BI
+
+			- **Definition**: New columns added to existing tables to derive data from existing columns.  
+			- **Usage**: Can be used in reports and visualizations like regular columns.  
+			- **Creation with DAX**:  
+			  - Define DAX expressions combining data from two or more columns.  
+			  - Example: `Total Sales = Quantity * Unit Price`  
+			  - Further columns like `Profit` or `Profit Margin` can be calculated using additional DAX expressions.  
+			- **Formatting & Utilization**:  
+			  - Format columns appropriately (currency, percentage, etc.).  
+			  - Use them in reports to gain meaningful insights from existing data.
+
+		- ## Measures
+		- **What are Measures?**    
+		    - Smart, real-time calculations created with DAX.        
+		    - Perform tasks like totals, averages, counts, and advanced calculations.        
+		    - Automatically adapt to filters and report interactions. 
+		    - Useful for creating **Calculated Tables**.
+		- **Benefits of Measures:**    
+		    1. **Dynamic** – update automatically based on filters/visual context.        
+		    2. **Reusable** – one measure can be used across multiple reports/visuals.        
+		    3. **Performance Tracking** – essential for creating KPIs.        
+		    4. **Consistency** – standardized calculations ensure reliable results.
 	- ### Types of Measures
 	1. **Additive Measures**    
 	    - Can be summed across all dimensions.        
@@ -161,13 +257,19 @@
 	    - Example: _Inventory Balance_ → can be summed across product categories or locations, but not across time periods (e.g., 50 units in Jan + 60 in Feb ≠ 110 units).
 - ## Cross-Filter Direction in Power BI
 	- In Power BI, **cross-filter direction** controls how filters flow between related tables in a data model. This is critical for analyzing data across multiple tables without writing complex queries.
+ 
 		- **Single Direction Filtering (default)**    
 		    - Filters flow **one way**, usually from dimension → fact table.        
 		    - Example: Filtering the _Salesperson_ table automatically filters the _Sales_ table for that person’s sales.        
 		- **Bidirectional Filtering**    
 		    - Filters flow **both ways** between tables.   (facts -> dimensions)     
 		    - Example: Filtering _Sales_ also filters _Salesperson_ and _Product_ tables, letting you see which products each salesperson sold.        
-		    -  More flexible but can reduce performance and create ambiguous filter paths. 
+		    -  More flexible but can reduce performance and create ambiguous filter paths.
+            - ### Drawbacks of Bi-Directional Filtering in Power BI
+				- **Performance Impact**: Can slow down performance with large datasets due to extra processing.  
+				- **Ambiguous Filter Paths**: Creates confusion in filter propagation, leading to possible incorrect analysis.  
+				- **Complexity in Data Models**: Makes relationships harder to manage, maintain, and understand.  
+				- **Risk of Circular References**: May cause calculation or data retrieval errors if not handled carefully.   
 		- **Example**
 		- ## Tables
 			**Salesperson** (Dimension)
