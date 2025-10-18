@@ -255,6 +255,118 @@
 	    - Can be aggregated across some dimensions, but not all.        
 	    - Typically used for values at a specific point in time.        
 	    - Example: _Inventory Balance_ → can be summed across product categories or locations, but not across time periods (e.g., 50 units in Jan + 60 in Feb ≠ 110 units).
+  # 📊 Custom Measures vs Traditional Measures in Power BI
+
+Understanding the difference between **Traditional (Built-in)** and **Custom (DAX)** measures is key to mastering Power BI analytics.
+
+---
+
+## ⚖️ Comparison Table
+
+| **Aspect** | **Traditional Measure** | **Custom Measure (DAX Measure)** |
+|-------------|--------------------------|----------------------------------|
+| **Definition** | Predefined aggregations created automatically by Power BI when you drag a numeric field into a visual (e.g., *Sum of Sales Amount*). | Manually created calculations using **DAX (Data Analysis Expressions)** to apply business logic beyond basic aggregation. |
+| **Creation** | Generated automatically — no coding needed. | Defined manually using DAX formulas in the *Modeling* tab → *New Measure*. |
+| **Flexibility** | Limited to basic aggregations like SUM, AVERAGE, MIN, MAX, COUNT. | Highly flexible — supports conditions, filters, time intelligence, and context-based logic (e.g., YTD, running totals, ratios). |
+| **Context Awareness** | Reacts to filters and slicers automatically but within default aggregation rules. | Fully **context-sensitive** — DAX gives control over **filter** and **row** context for dynamic calculations. |
+| **Use Cases** | Quick summaries (e.g., total revenue, total quantity). | Advanced business metrics (e.g., profit margin %, revenue growth, customer retention rate). |
+| **Example** | `SUM(Sales[SalesAmount])` (auto-created). | `Profit Margin = DIVIDE([Total Profit], [Total Sales])` or `YTD Sales = TOTALYTD([Total Sales], 'Date'[Date])`. |
+| **Performance** | Usually faster due to simple aggregation. | May be slower if logic is complex or uses nested DAX functions. |
+
+---
+
+## Real-World Business Example – Adventure Works: Sales Growth YoY
+
+Adventure Works wants to track Year-over-Year (YoY) Sales Growth to understand business performance trends.
+
+🔸 Step 1: Define Total Sales
+  **Total Sales =
+SUM(Sales[SalesAmount])**
+
+🔸 Step 2: Define Previous Year Sales
+**Previous Year Sales =
+CALCULATE(
+    [Total Sales],
+    SAMEPERIODLASTYEAR('Date'[Date])
+)**
+
+🔸 Step 3: Define Year-over-Year Growth %
+  **YoY Growth % =
+DIVIDE(
+    [Total Sales] - [Previous Year Sales],
+    [Previous Year Sales]
+)**
+
+📈 How It Works
+- The context (selected year in a visual or filter) dynamically changes the result.
+- The measure uses time intelligence functions (SAMEPERIODLASTYEAR, TOTALYTD) to compare current vs. prior year.
+- This flexibility is only possible with custom DAX measures, not traditional aggregations
+
+   ---
+     - ## Common Statistical Functions
+
+		### **Average (Mean)**
+		- Adds all numbers in a dataset and divides by the total count.  
+		- Represents the **central tendency** or “middle ground.”  
+		- **Example:** Adventure Works calculates average sales amount using `Sales[Sales Amount]` column.
+		
+		
+		
+		### **Median**
+		- Finds the **middle value** after sorting numbers in ascending order.  
+		- Less influenced by **outliers** or **skewed data**.  
+		- Works **only with numeric data** (not text, dates, or logical values).  
+		- **Example:** Adventure Works computes median response time using `Support[Response Time]`.
+		
+		
+		
+		### **Count**
+		- Counts the **number of rows** in a table or column.  
+		- Can count all rows or those that meet **specific criteria**.  
+		- Returns **blank** if no rows are found.  
+		- **Example:** Counting sales per product category in `Sales[Category]`.
+		
+	
+		
+		### **DistinctCount**
+		- Counts the **number of unique (distinct)** values in a column.  
+		- Useful for finding **unique categories** or **IDs**.  
+		- Returns **blank** if no rows are found.  
+		- **Example:** Counting unique daily visitors using `Website[VisitorID]`.
+		
+		
+		
+		### **Min and Max**
+		- **Min** identifies the **smallest value**.  
+		- **Max** identifies the **largest value**.  
+		- Provide an overview of the **data range**.  
+		- **Example:** Finding minimum and maximum product quantity from `Inventory[Quantity]`.
+		
+		
+		
+		### When to Use **Average** vs **Median**
+		
+		### **Average (Mean)**
+		- Use when data is **normally distributed** (no extreme outliers).  
+		- Shows the **overall trend** or a fair “typical” value.  
+		- **Example:** Calculating the average sales per transaction when most sales fall between ₹900–₹1100.
+		
+		**Avoid average when:**  
+		- Data contains **outliers** (very high or low values) that can distort results.
+		
+		
+		
+		### **Median**
+		- Use when data has **outliers** or is **skewed**.  
+		- Represents the **true middle value**, unaffected by extremes.  
+		- **Example:** Calculating the median employee salary when a few executives earn far more than the rest.
+		
+		**Supported data types:**  
+		- Works only with **numeric data** (not text or dates).  
+		- For timestamps, convert them to **numeric durations** (e.g., seconds) before applying median.
+		
+		---
+
 - ## Cross-Filter Direction in Power BI
 	- In Power BI, **cross-filter direction** controls how filters flow between related tables in a data model. This is critical for analyzing data across multiple tables without writing complex queries.
  
