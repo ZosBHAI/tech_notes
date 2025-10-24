@@ -453,7 +453,59 @@ DIVIDE(
 		- #### 3. Sales by Delivery Date (another inactive relationship)
 			`Total Sales by Delivery Date = CALCULATE (     SUM ( Sales[SalesAmount] ),     USERELATIONSHIP ( Sales[DeliveryDate], Date[DateKey] ) )`
 			👉 Same idea, but now using DeliveryDate instead.
-			
+---
+# Time Intelligence : 
+ 
+## ✅ What the Auto Date/Time Setting Does
+- When enabled (it’s on by default), Power BI automatically detects **date/time fields** and creates **hidden date hierarchies** (Year, Quarter, Month, Day) for each date column.
+- It looks convenient because visuals instantly get date hierarchies — no setup required.
+
+## ❌ Why It Can Cause Problems
+### 1. Limited Flexibility
+- Designed for **simple models** with one date column.
+- Fails in **complex models** with multiple dates or multiple fact tables.
+- Difficult to compare or slice across **different date roles** (e.g., Order Date vs. Ship Date).
+- Not suitable for advanced calculations like **rolling averages**, **custom fiscal years**, or **multi-fact time comparisons**.
+### 2. Model Size & Performance Impact
+- Power BI creates a **hidden date table** for *every* date column — even if you don’t use them.
+- These hidden tables include extra columns (MonthNo, QuarterNo, etc.) that increase model size.
+- Example: Turning off Auto Date/Time reduced model size by **~14.5%** in one case study.
+### 3. DAX Complexity & Unexpected Behavior
+- Auto hierarchies require special DAX syntax, e.g., `Table[DateColumn].[Date]`.
+- Picking the wrong hierarchy level can produce **incorrect results or errors**.
+- Adds confusion for beginners learning DAX or time intelligence.
+## 🧭 Better Alternatives
+Instead of using Auto Date/Time, **create your own common Date Table** using one of these methods:
+1. **DAX Functions**
+   - Use `CALENDAR()` or `CALENDARAUTO()` to generate a date table dynamically.
+2. **Power Query**
+   - Build a custom calendar using M code to include fiscal years, holidays, or ISO weeks.
+3. **Import from Database**
+   - Use a **shared corporate calendar table** for consistent reporting across departments.
+### 🔧 Pro Tip:
+Before creating your own date table, **turn off Auto Date/Time** in Power BI:  
+`File → Options → Data Load → Time Intelligence → Uncheck "Auto Date/Time for new files"`
+## 🎯 What This Means for You (Beginners)
+- For **simple reports** (single table, one date column), Auto Date/Time may seem fine — but it won’t scale.
+- For **real-world reports** with multiple date fields or complex time-based metrics:
+  - Always use a **custom Date Table**.
+  - Mark it as the official Date Table in Power BI.
+- Learning to build a proper Date Table early helps avoid:
+  - Performance issues  
+  - Confusing DAX syntax  
+  - Inconsistent time intelligence calculations  
+> 💡 *Tip:* Build one **common date table** and reuse it across all your Power BI models — it’s faster, cleaner, and more reliable.
+
+## 📚 Recommended Reading
+- [Auto date/time guidance in Power BI Desktop (Microsoft Docs)](https://learn.microsoft.com/en-us/power-bi/guidance/auto-date-time?utm_source=chatgpt.com)
+- [Design guidance for date tables in Power BI Desktop (Microsoft Docs)](https://learn.microsoft.com/en-us/power-bi/guidance/model-date-tables?utm_source=chatgpt.com)
+- [SQLBI: Automatic time intelligence in Power BI](https://www.sqlbi.com/articles/automatic-time-intelligence-in-power-bi/?utm_source=chatgpt.com)
+- [Triangle IM Article (Original Source)](https://triangle.im/power-bi-mistake-6-why-you-should-ditch-the-auto-date-time-setting/?utm_source=chatgpt.com)
+
+---
+
+
+
 		    
 	
 	
