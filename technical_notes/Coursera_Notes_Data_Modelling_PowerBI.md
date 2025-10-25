@@ -503,6 +503,93 @@ Before creating your own date table, **turn off Auto Date/Time** in Power BI:
 - [Triangle IM Article (Original Source)](https://triangle.im/power-bi-mistake-6-why-you-should-ditch-the-auto-date-time-setting/?utm_source=chatgpt.com)
 
 ---
+# Optimization 
+- ### 1. Understanding Cardinality and Performance Optimization in Power BI
+	## 📘 What is Cardinality?
+	**Cardinality** refers to the number of **unique values** in a column.
+	### Example:
+	| Column Name | Example Values | Cardinality Type |
+	|--------------|----------------|------------------|
+	| Product Category | Road Bikes, Mountain Bikes, Accessories | Low |
+	| Product ID | 1001, 1002, 1003, … | High |
+	A column with many unique values (like transaction IDs or timestamps) has **high cardinality**.
+	## ⚙️ Why Reducing Cardinality Matters
+	High cardinality can:
+	- Increase your **data model size**  
+	- Slow down **query performance**  
+	- Cause **long report loading times**
+	💡 **Analogy:**  
+	High cardinality is like finding a book in a library with no indexing system — Power BI needs to scan through more unique values, slowing performance.
+	## 🧠 Identifying High Cardinality
+	You can detect high cardinality by:
+	- Inspecting columns with many unique entries  
+	- Checking numeric or decimal fields with too much precision  
+	- Reviewing columns like *IDs, timestamps, weights,* or *invoice numbers*
+	Use **Data View** or **Power Query Editor** in Power BI to inspect uniqueness.
+	## 🪄 Techniques to Reduce Cardinality
+	### 1. 🔹 Summarization (Aggregation)
+	Instead of analyzing every transaction, **group data** at a higher level.
+	**Example:**  
+	Aggregate sales by:
+	- Product Category  
+	- Order Date  
+	- Delivery Date  
+	**Steps:**
+	1. Open **Power Query Editor**
+	2. Select the column to group  
+	3. Go to **Transform → Group By**
+	4. Choose an aggregation (e.g., `Sum`, `Count`, `Average`)
+	5. Click **OK** to apply
+	✅ **Result:** Smaller dataset → faster queries → better report performance.
+	### 2. 🔹 Using Fixed Decimals
+	Columns with **high-precision decimal values** (like product weight `12.456789`) increase cardinality.
+	**Solution:** Convert to **Fixed Decimal Number**.
+	**Steps:**
+	1. Select the decimal column  
+	2. Go to **Transform → Data Type → Fixed Decimal Number**
+	Example:  
+	`12.456789` → `12.46`
+	✅ **Result:** Fewer unique values → reduced cardinality → faster performance.
+	## ⚖️ Trade-Offs
+	Reducing cardinality can **reduce granularity**.  
+	Before applying changes, ask:
+	> “Do I still have enough detail for accurate analysis?”
+	Find the right balance between **performance** and **data accuracy**.
+	## 🧩 Key Takeaways
+	- High cardinality = slow Power BI performance  
+	- Reduce cardinality using:
+	  - ✅ **Summarization**
+	  - ✅ **Fixed decimals / rounding**
+	- Always balance **speed vs detail**
+	- Remember:
+	  > “It’s not about having less data or more data — it’s about having the right data.”
+	### 2. Optimizing Relationships and Cross-Filter Directions
+	-  **many-to-many** relationship occurs when both sides have multiple matching records — for example, multiple products from multiple suppliers.
+	  These many-to-many links can create **circular dependencies**, leading to **slow query performance** or even failed data loads.
+	- Identifying the Issue
+		You can view and edit relationships using the **Model View** in Power BI:
+		1. Select the **Model** icon from the left pane.  
+		2. Look for relationships represented by lines between tables.  
+		3. Double-click on the relationship line between **Products** and **Suppliers** to open the **Edit Relationship** dialog box.
+	- Resolving the Issue – Adjusting Cross Filter Direction
+		In the **Edit Relationship** dialog:			
+		- Locate **Cross Filter Direction**.  
+		- By default, it may be set to **Both**, allowing filters to flow both ways.  
+		- This can cause unnecessary complexity and slow down performance.
+		To optimize:
+		
+		1. Change **Cross Filter Direction** from **Both** to **Single** (e.g., *Suppliers filters Products*).  
+		2. Click **OK** to apply changes.
+		
+		This ensures filters flow in only one direction — simplifying calculations and reducing query time.
+ 
+
+
+	## 🔗 Recommended Reading
+	- [Optimize Model Performance - Microsoft Learn](https://learn.microsoft.com/en-us/power-bi/guidance/modeling-model-size-reduction)
+	- [Understanding Data Cardinality in Power BI](https://learn.microsoft.com/en-us/power-bi/guidance/star-schema#understand-data-cardinality)
+	- [Improve Performance with Aggregations in Power BI](https://learn.microsoft.com/en-us/power-bi/transform-model/aggregations-advanced)
+
 
 
 
