@@ -582,13 +582,167 @@ Before creating your own date table, **turn off Auto Date/Time** in Power BI:
 		2. Click **OK** to apply changes.
 		
 		This ensures filters flow in only one direction — simplifying calculations and reducing query time.
+	### 3. Optimizing DirectQuery Mode in Power BI
+	### 🔍 Overview
+	AdventureWorks, a global manufacturing company, wants to build a **real-time sales dashboard** using **Power BI**.  
+	Because the data changes continuously and must respect database-level security, **DirectQuery** is chosen as the connectivity option instead of data import.  
+    ### ⚙️ What is DirectQuery?
+	- **DirectQuery** connects Power BI directly to the **underlying data source** (e.g., SQL Server) without importing data into memory.  
+	- Each visual in the report **sends a query** to the source to retrieve real-time data.  
+	- The **schema (structure)** is loaded into Power BI, but the **data stays in the source system**.
+	
+
+	
+	### ✅ Benefits of DirectQuery
+	1. **Real-Time Analysis**  
+	   - Reports show up-to-date data since queries are executed live on the source.  
+	   - Ideal for monitoring transactional or operational systems (e.g., live sales data).  
+	
+	2. **Reduced Memory Usage**  
+	   - Power BI doesn’t store data locally — avoiding large dataset imports.  
+	
+	3. **Security Compliance**  
+	   - Enforces **database-level permissions**, so users only see data they’re authorized to access.  
+	
+	
+	
+	### ⚙️ Behavior and Refresh Cycle
+	- When using DirectQuery, visuals send queries to the database **each time** the report is refreshed or interacted with.  
+	- **Data refresh frequency** can be configured (e.g., hourly updates before a presentation).  
+	- Reports load only metadata (schema), not the actual data, until visuals are rendered.  
+	- **Performance** depends on:
+	  - Source system speed  
+	  - Network latency  
+	  - Query complexity  
+	
+	
+	### ⚠️ Limitations and Performance Considerations
+	
+	1. **Slower Performance**  
+	   - Querying live data from a remote server is **slower than importing data into memory**.  
+	   - Response time depends on the size of data and the server’s processing capacity.  
+	
+	2. **Limited Transformations**  
+	   - Not all **Power Query transformations** are supported.  
+	   - SQL Server supports some; **SAP BW** and other systems may support none.  
+	   - In such cases, transformations must be done **at the source**.  
+	
+	3. **Restricted Modeling and DAX Capabilities**  
+	   - **No default date hierarchies** in DirectQuery mode.  
+	   - **Some DAX functions** (e.g., parent-child, time intelligence) aren’t available.  
+	   - **Complex DAX** measures can degrade performance — prefer simple aggregations.  
+	
+	4. **Unsupported Features in Power BI Service**  
+	   - **Quick Insights** and **Q&A (natural language)** features are not available in DirectQuery mode.  
+	   - Filters and slicers can trigger multiple queries, increasing load times.  
+		
+	### 💡 Best Practices
+	- Use **DirectQuery only when real-time data** is essential.  
+	- Optimize the **underlying database** (indexes, query tuning).  
+	- Use **aggregations** to reduce query volume.  
+	- Keep DAX measures **simple** and **test performance** iteratively.  
+	- Limit the number of visuals and interactions per page.  
+	- Consider **hybrid models** (Import + DirectQuery) for a balance between speed and freshness.
+   ### 4. Optimizing Query Performance in DirectQuery Mode
+
+	#### Overview
+	AdventureWorks reports are running slowly because each visual and slicer interaction sends **live queries** to the database via DirectQuery.  
+	Performance optimization must therefore happen at **all layers** — especially the **source database** and the **Power BI model**.
+		
+	#### Key Optimization Strategies
+	
+	1. **Optimize the Underlying Data Source**
+	   - Tune the source database for faster query execution.  
+	   - **Avoid complex calculated columns**, since these are embedded directly into the query.  
+	   - **Review and maintain indexes** to improve lookup performance.
+	
+	2. **Reduce Query Frequency**
+	   - In DirectQuery, each slicer/filter interaction can trigger multiple database queries.  
+	   - Use **Power BI’s query reduction options** to minimize unnecessary calls.  
+	   - Limit the number of **multi-select slicers** or **filters**.
+	
+	3. **Use Aggregations**
+	   - Create **pre-aggregated summary tables** stored in memory to reduce the number of source queries.  
+	   - Aggregations drastically improve report responsiveness while maintaining accuracy.
+	
+	4. **Optimize the Data Model**
+	   - Simplify table relationships.  
+	   - Remove unused or redundant columns.  
+	   - Avoid **complex DAX calculations** that can trigger repetitive database queries.  
+	   - Limit the number of **visuals per page** to reduce parallel query load.
+	
+	
+	
+	#### Best Practice
+	- Combine **database tuning**, **query reduction**, and **model simplification**.  
+	- Focus on achieving the best trade-off between **real-time connectivity** and **report responsiveness**.  
+	- These optimizations ensure a smooth, high-performance DirectQuery experience for users.
+   ### 5. Optimizing DirectQuery Performance Using Table Storage
+  #### What Are Storage Modes?
+	- Storage modes determine where table data is stored and how queries are executed.
+	- Each table in Power BI can have its own storage mode.
+	- Proper configuration can significantly improve interactivity and query response time.
+ ### Types of Storage Modes in Power BI
+#### **Import Mode**
+- Data is stored in-memory within Power BI.  
+- Queries run against the in-memory data, not the data source.  
+- Fastest for analysis, but requires memory space.  
+- **Example:** AdventureWorks imports the *Sales* table from SQL Server into Power BI memory.  
+
+#### **DirectQuery Mode**
+- Data remains in the source system (e.g., SQL Server).  
+- Power BI sends live SQL queries to retrieve results.  
+- Supports real-time data, but depends on source performance.  
+- You can monitor and optimize queries using SQL Profiler.  
+
+#### **Dual Mode**
+- Acts as both Import and DirectQuery, depending on context.  
+- Queries may be served from in-memory cache or executed live at the source.  
+- Useful for hybrid models, combining real-time accuracy with cached performance.  
+### How to Configure Storage Mode
+
+1. In Power BI Desktop, connect to **SQL Server** using **DirectQuery**.  
+2. Select the desired database and tables (e.g., *InternetSales*, *Product*, *Customer*, *SalesTerritory*).  
+3. Open **Model View → Properties Pane → Advanced**.  
+4. Under **Storage Mode**, choose between **Import**, **DirectQuery**, or **Dual**.  
+5. Confirm any warnings before changing modes (*Import is irreversible for that table*).
+---
+## 6. Improving DirectQuery Performance Using Aggregations
+### Overview
+Aggregations in Power BI enable fast query performance and interactivity in **DirectQuery** mode by storing pre-calculated summary data in memory.  
+This helps overcome latency caused by live queries to large data sources.
+
+### 🧠 What Are Aggregations?
+
+- Aggregations summarize large volumes of data into **pre-computed summary tables**.  
+- They improve performance by allowing Power BI to query **smaller in-memory tables** instead of the full dataset.  
+- Work best when used in **Composite Models** — a mix of DirectQuery and Import modes.  
+
+### ⚙️ Scenario Example
+AdventureWorks wants to analyze five years of sales data across products and regions.  
+The fact table contains tens of millions of rows, slowing queries.  
+By aggregating sales data (e.g., total sales by **year**, **region**, and **product**), the dataset size drops drastically — boosting performance and query speed.
+
+### 🧩 Benefits of Aggregations
+- ⚡ **Faster and optimized query performance** for large datasets.  
+- 📈 **Reduced refresh time** since aggregated tables are smaller.  
+- 🧱 **Scalable** — supports future data growth without performance degradation.  
+
+### 🧭 Creating Aggregations
+You can create aggregations in Power BI using one of the following methods:
+1. **Database-level tables** – Create pre-aggregated tables directly in the data source (e.g., SQL Server).  
+2. **Database views** – Build SQL views for aggregated data and import them into Power BI.  
+3. **Power Query Editor** – Perform aggregation transformations within Power BI itself.  
+### Additional Resources
+- [Optimize aggregations in Power BI - Microsoft Learn](https://learn.microsoft.com/power-bi/transform-model/aggregations)  
+- [Composite models and aggregations in Power BI](https://learn.microsoft.com/power-bi/transform-model/desktop-composite-models)  
+ 
+  
+
+
  
 
 
-	## 🔗 Recommended Reading
-	- [Optimize Model Performance - Microsoft Learn](https://learn.microsoft.com/en-us/power-bi/guidance/modeling-model-size-reduction)
-	- [Understanding Data Cardinality in Power BI](https://learn.microsoft.com/en-us/power-bi/guidance/star-schema#understand-data-cardinality)
-	- [Improve Performance with Aggregations in Power BI](https://learn.microsoft.com/en-us/power-bi/transform-model/aggregations-advanced)
 
 
 
