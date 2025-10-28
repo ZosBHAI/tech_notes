@@ -684,10 +684,12 @@ Before creating your own date table, **turn off Auto Date/Time** in Power BI:
 	- Proper configuration can significantly improve interactivity and query response time.
  ### Types of Storage Modes in Power BI
 #### **Import Mode**
+- When querying or refreshing, the data must be fully loaded into the memory of the Power BI capacity, and the refresh data operation requires loading new data to replace the original data.
 - Data is stored in-memory within Power BI.  
 - Queries run against the in-memory data, not the data source.  
 - Fastest for analysis, but requires memory space.  
-- **Example:** AdventureWorks imports the *Sales* table from SQL Server into Power BI memory.  
+- **Example:** AdventureWorks imports the *Sales* table from SQL Server into Power BI memory.
+- **Note:** When refreshed, data is compressed and optimized and then stored to disk by the VertiPaq storage engine. When loaded from disk into memory, it's possible to see 10-times compression. So, it's reasonable to expect that 10 GB of source data can compress to about 1 GB in size.  
 
 #### **DirectQuery Mode**
 - Data remains in the source system (e.g., SQL Server).  
@@ -698,7 +700,14 @@ Before creating your own date table, **turn off Auto Date/Time** in Power BI:
 #### **Dual Mode**
 - Acts as both Import and DirectQuery, depending on context.  
 - Queries may be served from in-memory cache or executed live at the source.  
-- Useful for hybrid models, combining real-time accuracy with cached performance.  
+- Useful for hybrid models, combining real-time accuracy with cached performance.
+#### Factors for choosing the Storage Mode 
+- **Cost Considerations with DirectQuery**
+	- DirectQuery queries data live from the cloud source every time a user interacts with a report.
+	- Cloud services (like Snowflake) often bill based on query usage or compute time.
+	- More users + more reports = more queries → higher costs.
+	- Costs depend on the specific data source’s pricing model.
+	- It’s important to monitor usage and optimize queries to avoid unexpected cloud charges.
 ### How to Configure Storage Mode
 
 1. In Power BI Desktop, connect to **SQL Server** using **DirectQuery**.  
