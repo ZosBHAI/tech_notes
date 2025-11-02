@@ -692,7 +692,7 @@ Before creating your own date table, **turn off Auto Date/Time** in Power BI:
 - **Note:** When refreshed, data is compressed and optimized and then stored to disk by the VertiPaq storage engine. When loaded from disk into memory, it's possible to see 10-times compression. So, it's reasonable to expect that 10 GB of source data can compress to about 1 GB in size.  
 
 #### **DirectQuery Mode**
-- Data remains in the source system (e.g., SQL Server).  
+- Data remains in the source system (e.g., SQL Server). Fires Federated query at the source. 
 - Power BI sends live SQL queries to retrieve results.  
 - Supports real-time data, but depends on source performance.  
 - You can monitor and optimize queries using SQL Profiler.  
@@ -701,6 +701,25 @@ Before creating your own date table, **turn off Auto Date/Time** in Power BI:
 - Acts as both Import and DirectQuery, depending on context.  
 - Queries may be served from in-memory cache or executed live at the source.  
 - Useful for hybrid models, combining real-time accuracy with cached performance.
+#### **Direct Lake**
+- Direct Lake and import queries are processed by the VertiPaq query engine.  
+- Direct Lake refresh is a low-cost operation that analyzes the metadata of the latest version of the Delta tables and is updated to reference the latest files in OneLake.
+	-  **Pre-conditions / things to check**
+			- Direct Lake assumes that data preparation is done upstream in the lakehouse/warehouse layer (i.e., you have delta tables etc) rather than doing heavy data preparation inside the semantic model.
+			- If the model author (e.g., self-service analyst) doesn’t have the ability to modify the underlying lakehouse (for example write permissions on the lake layer), then Import mode might be a more practical choice. 
+			- You must also consider the capacity/license model of your environment (i.e., the **Microsoft Fabric capacity SKU and guardrails**) before committing to Direct Lake.
+    - **Direct Lake Guardrails and Limits**
+Fabric SKU Tiers: Each SKU (F2, F4, F8, F16, F32, F64/FT1, F128, F256, F512, F1024, F2048) defines strict upper bounds for Parquet files per table, row groups per table, maximum rows per table (in millions), maximum model size on disk, and maximum available memory per model.​
+**Critical Limits by SKU:**
+			- Parquet Files Per Table: Lower tiers (F2-F32) limit to 1,000 files; higher tiers allow up to 10,000.
+			- Row Groups Per Table: Similar scaling from 1,000 up to 10,000 at top tiers.
+			- Rows Per Table: Starts at 300M and increases to 24B at highest SKU.
+			- Max Model Size on Disk/OneLake: Lower SKUs restrict to 10-40GB; higher SKUs remove practical limits.
+			- Max Memory: Ranges from 3GB (F2-F8) up to 400GB for top-tier SKUs
+    	
+- Even if you stay on Import mode, Fabric’s **OneLake integration** quietly turns your imported data into Delta tables — letting you tap into the full Fabric ecosystem without any migration or redesign effort.
+	- With Microsoft **OneLake integration** for semantic models, data imported into model tables can also be automatically written to Delta tables in OneLak
+
 #### Factors for choosing the Storage Mode 
 - **Cost Considerations with DirectQuery**
 	- DirectQuery queries data live from the cloud source every time a user interacts with a report.
