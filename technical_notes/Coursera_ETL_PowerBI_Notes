@@ -1,0 +1,19 @@
+# Local Datasets vs. Shared Datasets
+
+## Introduction
+  In organizations, multiple departments often use the same data for reporting and analysis. Without a centralized approach, this leads to data duplication, confusion about data sources, and inefficiency.  
+  Power BI resolves this through **datasets**, enabling centralized, reusable data models for consistent and accurate reporting.
+
+## Datasets in Power BI
+  A **dataset** is a curated data model used as a single source of truth for reports and dashboards.  
+
+### Key Features
+- **Build Permission:** Controls who can create content or access the dataset in or outside Power BI (e.g., Excel).  
+- **Endorsements:**
+- **Promoted:** Shared broadly for general use.  
+- **Certified:** Formally approved, ensuring data quality and governance.  
+- **Power BI Data Hub:** Enables dataset discovery and reuse across workspaces, fostering a collaborative data culture.
+### Conclusion
+- **Local Datasets** are ideal for smaller teams or projects needing high security and speed.  
+- **Shared Datasets** suit larger organizations emphasizing collaboration, consistency, and scalability.  
+- The choice between them depends on organizational size, security needs, and collaboration requirements.
