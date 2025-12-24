@@ -118,7 +118,7 @@ Fabric Pipelines support:
 Retry logic can be implemented using:
 
 - SQL
-- Python
+- Python (uses Tenacity,as it available in Fabric's Spark Cluster )
 
 
 **Typical logic:**
@@ -126,9 +126,9 @@ Retry logic can be implemented using:
 1. Catch snapshot conflict error
 2. Wait for a short interval
 3. Retry until success
+- **Fixed Retry Vs Programmatic Retry**
+> Fixed retry is a configuration-based approach that requires no custom code, but it offers limited control over retry behavior. In contrast, programmatic retry provides greater implementation flexibility, allowing explicit definition of stop conditions (such as a maximum number of retry attempts) and wait strategies (such as exponential backoff between retries).
 
-> ⚠️ **Drawbacks**
-> - Adds implementation complexity
 ### 🏗️ Solution 3: Use an OLTP Database (Microsoft-Recommended)
 
 Microsoft recommends moving transactional metadata to an OLTP system.
