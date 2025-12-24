@@ -67,7 +67,7 @@ Under snapshot isolation:
 > ⚠️ This behavior is expected and by design in Fabric Warehouse.
 
 ---
-### ✅ Solution 1: Append-Only Status Table (Recommended)
+### ✅ Solution 1: Append-Only Status Table 
 
 The most effective solution is to eliminate `UPDATE` statements.
 
@@ -88,14 +88,13 @@ Job Failed → INSERT row
 - `INSERT` operations do not modify existing files
 - Delta Lake allows concurrent `INSERT`s
 - No snapshot isolation conflicts
+> ⚠️ **Design consideration**
+ - In an append-only design, each job execution inserts a new record rather than updating existing rows.As a result, multiple records can exist for the same job, each representing a different run.
+ - To derive the current or latest run status, the query must:
+    - Partition data by Job_ID (or equivalent)
+    - Order runs by `Run_Start_Time`, `Run_End_Time`, or `Run_ID`
+    - Select the most recent row using a window function.
 
-#### Benefits
-
-- 🚀 Highly scalable
-- 📜 Fully auditable (complete job history)
-- ⭐ Best practice for Fabric-native architectures
-
----
 
 ### 🔁 Solution 2: Retry Mechanism
 
@@ -156,3 +155,6 @@ It is **not** designed for high-frequency transactional updates.
 - Row-level locking
 - Better concurrency handling
 - No snapshot write-write conflicts
+---
+## Artifacts:
+![Notebooks &Pipeline](https://github.com/ZosBHAI/tech_notes/tree/master/technical_notes/ytube_contents/Fabric/Snapshot_Isolation/code)
