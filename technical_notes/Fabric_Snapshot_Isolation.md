@@ -127,7 +127,7 @@ Retry logic can be implemented using:
 2. Wait for a short interval
 3. Retry until success
 - **Fixed Retry Vs Programmatic Retry**
-> Fixed retry is a configuration-based approach that requires no custom code, but it offers limited control over retry behavior. In contrast, programmatic retry provides greater implementation flexibility, allowing explicit definition of stop conditions (such as a maximum number of retry attempts) and wait strategies (such as exponential backoff between retries).
+> Fixed retry is a out-of-box no-code solution, but it offers limited control over retry behavior. In contrast, programmatic retry provides greater implementation flexibility, allowing explicit definition of stop conditions (such as a maximum number of retry attempts) and wait strategies (such as exponential backoff between retries).
 
 ### 🏗️ Solution 3: Use an OLTP Database (Microsoft-Recommended)
 
