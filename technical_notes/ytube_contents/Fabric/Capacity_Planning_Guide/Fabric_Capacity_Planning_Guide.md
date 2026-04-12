@@ -4,20 +4,44 @@
 
 When estimating Microsoft Fabric capacity using the Azure Calculator, consider the following key components:
 
----
-
 ## 1. Fabric Compute Capacity (F-SKU)
 
 **References:**
 - [Metrics App](https://learn.microsoft.com/en-us/fabric/enterprise/metrics-app)
 - [Licenses](https://learn.microsoft.com/en-us/fabric/enterprise/licenses)
 
+-  What Is Fabric Capacity and How Does It Work?
+-  [Ref](https://tomkeim.nl/fabric-over-capacity/)
+
+Each capacity SKU in Microsoft Fabric defines a specific amount of available Capacity Units (CU). For example:
+
+- The F2 SKU provides 2 CU
+- The F256 SKU provides 256 CU
+
+Capacity Units are measured per second. So with an F256, you have access to 256 CU/s, which translates to:
+
+| Time Period | CU Consumption |
+| :--- | :--- |
+| Per second | 256 CU |
+| Per minute | 15,360 CU |
+| Per hour | 921,600 CU |
+| Per day | 22,118,400 CU |
+| Per 30 days | 663,552,000 CU |
+
 - Core compute is provisioned via Fabric Capacity (F-SKU)
 - This is the **primary cost driver**
 - Measured in **Compute Units (CUs)**
 - All workloads (Power BI, Spark, Data Warehouse, etc.) consume from this pool unless offloaded
 
----
+  ### Sample calculation:
+    - #### Fabric Pipeline :
+    - For example, every data movement in a Data Pipeline uses **1.5 CU-hours**, which equals **5,400 CU-seconds**.So for a second, 5400/(60x60) ~1.5 CU
+      So, if you have a Copy Data activity (with no parallel throughput) running for 30 minutes, it will consume: **5,400 × 0.5 hour = 2,700 CU-seconds**.
+      This means , 75% of an F2 capacity during that time
+   - #### Spark Notebook
+   - #### Fabric Warehouse 
+      
+
 
 ## 2. Spark Autoscaling (Serverless Offloading)
 
