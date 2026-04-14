@@ -197,3 +197,24 @@ Charges apply for:
 > Fabric pricing is **NOT** purely user-based (unlike Tableau/OBIEE)
 
 ### Pricing Model
+#### Premium Per Capacity (P Capacity)
+- This is called **P capacity** (higher tier)
+- Here you will have all the features of F
+- You have to enable it at the **Tenant level**
+- It is billed **per capacity**, not per user
+- **Rule of thumb:** If you have 10 users, don't go with this approach — buy F SKU + club with PPU or Pro license
+
+#### Premium Per User (PPU)
+Use PPU if you need features like:
+- Direct Query
+- Data Mart
+- 48 refreshes
+- Data Flow
+- XMLA Endpoint
+
+> **Note:** In this case you need F SKU.  
+> Only if you need **48 refreshes per day**, use PPU. Otherwise, switch to F SKU — these come as a part of it.
+
+#### Pro License
+- Needed when we **do not have 48 refreshes + F SKU**
+- Other features like Data Flow will still be available
