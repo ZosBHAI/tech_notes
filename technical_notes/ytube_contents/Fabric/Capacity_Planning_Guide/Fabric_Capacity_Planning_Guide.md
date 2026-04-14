@@ -36,8 +36,23 @@ When estimating Microsoft Fabric capacity using the Azure Calculator, consider t
     - #### Fabric Pipeline :
     - For example, every data movement in a Data Pipeline uses **1.5 CU-hours**, which equals **5,400 CU-seconds**.So for a second, 5400/(60x60) ~1.5 CU
       So, if you have a Copy Data activity (with no parallel throughput) running for 30 minutes, it will consume: **5,400 × 0.5 hour = 2,700 CU-seconds**.
-      This means , 75% of an F2 capacity during that time
-   - #### Spark Notebook
+      This means , 75% of an F2 capacity during that time **~0.75 CU-hours × $0.365 per hour = $0.27375**
+   - #### Spark Notebook [Reddit Post on this](https://www.reddit.com/r/MicrosoftFabric/comments/1k7easw/is_my_understanding_of_fabricspark_cu_usage_and/)
+   - **Concept:** One Capacity Unit = Two Spark VCores So F64 => 128 Spark Vcores and on which a 3x Burst Multiplier is applied which gives a total of 384 Spark VCores.
+   - Lets say I want a cluster with 10 Spark Medium nodes. Each medium node is 8vcore. So 10 Medium nodes will take 80 vcores. I want to run this for 2 hours daily. An F16 SKU will give me 96Vcore with 3x bursting. So F16 should be sufficient for this usage.A spark cluster of **10 medium nodes** for 2 hours and stop it. 2 hours of Spark cluster will consume **80*2 = 160 vcores** in total. 1 F16 gives me **16*2 = 32 vcore per hour**. So, ideally I used 160/32 F16 hours, which is 5.
+Cost of F16 for one hour is 2.88$. So cost of running my cluster is **2.88*5 = 15$**
+        | Component | Value |
+        | :--- | :--- |
+        | Cluster size | 10 Medium nodes (80 vCores) |
+        | Run duration | 2 hours |
+        | Total vCore consumption | 160 vCore-hours |
+        | F16 base capacity | 32 vCores per hour |
+        | F16 hours consumed | 5 hours |
+        | F16 hourly rate | $2.88 |
+        | **Total cost** | **~$15** |
+        
+        > **Note:** This calculation assumes the cluster runs at full capacity for 2 hours. F16 with 3× bursting provides 96 vCores, which comfortably supports the 80 vCore requirement.
+     
    - #### Fabric Warehouse 
       
 
