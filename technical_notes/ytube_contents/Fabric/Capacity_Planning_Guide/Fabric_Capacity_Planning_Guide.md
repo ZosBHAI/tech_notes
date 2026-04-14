@@ -53,7 +53,24 @@ Cost of F16 for one hour is 2.88$. So cost of running my cluster is **2.88*5 = 1
         
         > **Note:** This calculation assumes the cluster runs at full capacity for 2 hours. F16 with 3× bursting provides 96 vCores, which comfortably supports the 80 vCore requirement.
      
-   - #### Fabric Warehouse 
+   - #### Fabric Warehouse [Billing example](https://learn.microsoft.com/en-us/fabric/data-warehouse/usage-reporting#billing-example)
+       - **Concept:** 1 Fabric capacity unit = 0.5 Warehouse vCore
+       - Capacity Metrics App tracks warehouse consumption across three operation categories.
+           
+            | Operation Category | Description |
+            | :--- | :--- |
+            | **Warehouse Query** | All user-generated and system-generated T-SQL statements within a warehouse |
+            | **SQL Analytics Endpoint Query** | T-SQL queries on Lakehouse SQL endpoints |
+            | **OneLake Compute** | All reads and writes for data stored in OneLake |
+        - For example a query , consumes 100CU per seconds,and F-SKU is F16, hourly rate is $2.88:
+             - **Step-by-step breakdown:**
+                | Step | Calculation | Result |
+                | :--- | :--- | :--- |
+                | 1 | 100 × $2.28 | $228 |
+                | 2 | $228 ÷ 3,600 seconds | $0.06333 |
+              
+                > **Note:** At $2.28 per CU-hour, a 100 CU-second query costs roughly **6.3 cents USD**.
+         
       
 
 
