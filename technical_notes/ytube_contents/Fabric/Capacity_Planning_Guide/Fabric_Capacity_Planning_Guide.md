@@ -10,13 +10,13 @@ When estimating Microsoft Fabric capacity using the Azure Calculator, consider t
 - [Metrics App](https://learn.microsoft.com/en-us/fabric/enterprise/metrics-app)
 - [Licenses](https://learn.microsoft.com/en-us/fabric/enterprise/licenses)
 
--  What Is Fabric Capacity and How Does It Work?
+-  ### What Is Fabric Capacity and How Does It Work?
 -  [Ref](https://tomkeim.nl/fabric-over-capacity/)
 
 Each capacity SKU in Microsoft Fabric defines a specific amount of available Capacity Units (CU). For example:
 
-- The F2 SKU provides 2 CU
-- The F256 SKU provides 256 CU
+- The F2 SKU provides 2 CU per second
+- The F256 SKU provides 256 CU per second
 
 Capacity Units are measured per second. So with an F256, you have access to 256 CU/s, which translates to:
 
@@ -28,7 +28,6 @@ Capacity Units are measured per second. So with an F256, you have access to 256 
 | Per day | 22,118,400 CU |
 | Per 30 days | 663,552,000 CU |
 
-- Core compute is provisioned via Fabric Capacity (F-SKU)
 - This is the **primary cost driver**
 - Measured in **Compute Units (CUs)**
 - All workloads (Power BI, Spark, Data Warehouse, etc.) consume from this pool unless offloaded
