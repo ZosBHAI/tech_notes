@@ -29,7 +29,7 @@ When estimating Microsoft Fabric capacity using the Azure Calculator, consider t
       | Per 30 days | 663,552,000 CU |
 
 - This is the **primary cost driver**
-- Measured in **Compute Units (CUs)**
+- Measured in **Caapacity Units (CUs)**
 - All workloads (Power BI, Spark, Data Warehouse, etc.) consume from this pool unless offloaded
 - **Note** SKU is charged per hour , even if it is not used. You can avoid this by **Pausing** the Capacity.
 
