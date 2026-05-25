@@ -74,7 +74,7 @@ Cost of F16 for one hour is 2.88$. So cost of running my cluster is **2.88*5 = 1
                 > **Note:** At $2.28 per CU-hour, a 100 CU-second query costs roughly **6.3 cents USD**.
          
 - ### Analogy
-- ![Anallogy] (https://github.com/ZosBHAI/tech_notes/blob/master/technical_notes/ytube_contents/Fabric/Capacity_Planning_Guide/analogy_with_kitchen.png)
+ ![Anallogy](https://github.com/ZosBHAI/tech_notes/blob/master/technical_notes/ytube_contents/Fabric/Capacity_Planning_Guide/analogy_with_kitchen.png)
      > Imagine a large food court inside a shopping mall. kitchen infrastructure — cooking space, staff, electricity, and equipment — represents the overall Microsoft Fabric Capacity.Now imagine different food counters such as pizza, burgers, desserts, and beverages. These represent different Fabric workloads like:
 Power BI,Spark,Data Warehouse,Data Engineering
 Even though customers place orders at different counters, all of them depend on the same kitchen infrastructure behind the scenes.Similarly, in Microsoft Fabric, all workloads consume resources from the same shared compute pool.
