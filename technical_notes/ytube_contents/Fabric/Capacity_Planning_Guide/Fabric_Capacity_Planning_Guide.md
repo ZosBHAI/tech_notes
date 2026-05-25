@@ -73,7 +73,13 @@ Cost of F16 for one hour is 2.88$. So cost of running my cluster is **2.88*5 = 1
               
                 > **Note:** At $2.28 per CU-hour, a 100 CU-second query costs roughly **6.3 cents USD**.
          
-      
+- ### Analogy
+     > Imagine a large food court inside a shopping mall.The kitchen infrastructure — cooking space, staff, electricity, and equipment — represents the overall Microsoft Fabric Capacity.Now imagine different food counters such as pizza, burgers, desserts, and beverages. These represent different Fabric workloads like:
+Power BI,Spark,Data Warehouse,Data Engineering
+Even though customers place orders at different counters, all of them depend on the same kitchen infrastructure behind the scenes.Similarly, in Microsoft Fabric, all workloads consume resources from the same shared compute pool.
+The size of the kitchen determines how much work can be handled simultaneously.A small kitchen can process only a limited number of orders, while a larger kitchen can process many more requests at the same time.This kitchen size is similar to an SKU in Microsoft Fabric.
+     > Now imagine it is peak time and suddenly customer demand increases significantly.The kitchen owner decides to temporarily bring in extra cooks to handle the surge in orders.However, notice something important:The kitchen itself is not expanded permanently.Only additional staff are temporarily brought in to manage the increased workload.This is similar to **Bursting** in Microsoft Fabric.
+     > Imagine suddenly 500 customers arrive at the food court.If the kitchen tries to prepare all 500 orders immediately, the kitchen becomes overloaded and operations slow down.Instead, the kitchen intelligently organizes the work.Urgent customer orders are prepared immediately.Less urgent work, such as ingredient preparation or bulk orders, can be scheduled over time.Microsoft Fabric works in a similar way.Rather than consuming all Capacity Units immediately, Fabric intelligently distributes the workload over time.This concept is called **Smoothing**.
 
 
 ## 2. Spark Autoscaling (Serverless Offloading)
