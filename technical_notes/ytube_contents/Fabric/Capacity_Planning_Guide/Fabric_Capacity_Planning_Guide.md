@@ -12,6 +12,7 @@ When estimating Microsoft Fabric capacity using the Azure Calculator, consider t
 
 -  ### What Is Fabric Capacity and How Does It Work?
     -  [Ref](https://tomkeim.nl/fabric-over-capacity/)
+    -  Capacities use stock-keeping units (SKUs). Each SKU provides Fabric resources for your organization. Your organization can have as many capacities as needed.
     
     - Each capacity SKU in Microsoft Fabric defines a specific amount of available Capacity Units (CU). For example:
     
