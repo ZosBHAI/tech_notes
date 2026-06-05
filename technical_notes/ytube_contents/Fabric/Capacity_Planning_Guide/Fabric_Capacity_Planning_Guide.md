@@ -73,16 +73,55 @@ Cost of F16 for one hour is 2.88$. So cost of running my cluster is **2.88*5 = 1
               
                 > **Note:** At $2.28 per CU-hour, a 100 CU-second query costs roughly **6.3 cents USD**.
          
-- ### Analogy
+- ### Food Court Analogy: Understanding Fabric Capacity, Bursting, and Smoothing
  ![Anallogy](https://github.com/ZosBHAI/tech_notes/blob/master/technical_notes/ytube_contents/Fabric/Capacity_Planning_Guide/analogy_with_kitchen.png)
- >  Imagine a large food court inside a shopping mall. kitchen infrastructure — cooking space, staff, electricity, and equipment — represents the overall Microsoft Fabric Capacity.Now imagine different food counters such as pizza, burgers, desserts, and beverages. These represent different Fabric workloads like:
-Power BI,Spark,Data Warehouse,Data Engineering
-Even though customers place orders at different counters, all of them depend on the same kitchen infrastructure behind the scenes.Similarly, in Microsoft Fabric, all workloads consume resources from the same shared compute pool.
-The size of the kitchen determines how much work can be handled simultaneously.A small kitchen can process only a limited number of orders, while a larger kitchen can process many more requests at the same time.This kitchen size is similar to an SKU in Microsoft Fabric.
-     > Now imagine it is peak time and suddenly customer demand increases significantly.The kitchen owner decides to temporarily bring in extra cooks to handle the surge in orders.However, notice something important:The kitchen itself is not expanded permanently.Only additional staff are temporarily brought in to manage the increased workload.This is similar to **Bursting** in Microsoft Fabric.
-     > Imagine suddenly 500 customers arrive at the food court.If the kitchen tries to prepare all 500 orders immediately, the kitchen becomes overloaded and operations slow down.Instead, the kitchen intelligently organizes the work.Urgent customer orders are prepared immediately.Less urgent work, such as ingredient preparation or bulk orders, can be scheduled over time.Microsoft Fabric works in a similar way.Rather than consuming all Capacity Units immediately, Fabric intelligently distributes the workload over time.This concept is called **Smoothing**.
+ ### Kitchen = Microsoft Fabric Capacity
 
+- Imagine a large food court inside a shopping mall.
+- The **kitchen infrastructure** — cooking space, staff, electricity, and equipment — represents the **overall Microsoft Fabric Capacity**.
 
+### Food Counters = Fabric Workloads
+
+- Different food counters represent different Fabric workloads:
+  - Pizza → Power BI
+  - Burgers → Spark
+  - Desserts → Data Warehouse
+  - Beverages → Data Engineering
+
+### Shared Resource Pool
+
+- Even though customers place orders at different counters, all depend on the **same kitchen infrastructure** behind the scenes.
+- Similarly, in Microsoft Fabric, **all workloads consume resources from the same shared compute pool**.
+
+### Kitchen Size = SKU
+
+- The size of the kitchen determines how much work can be handled simultaneously.
+- A small kitchen processes only a limited number of orders.
+- A larger kitchen processes many more requests at the same time.
+- This kitchen size is similar to an **SKU** in Microsoft Fabric.
+
+### Bursting (Temporary Extra Staff)
+
+- During peak time, customer demand increases significantly.
+- The kitchen owner temporarily brings in **extra cooks** to handle the surge.
+- **Important:** The kitchen itself is not expanded permanently.
+- Only additional staff are temporarily brought in to manage the increased workload.
+- This is similar to **Bursting** in Microsoft Fabric.
+
+### Smoothing (Intelligent Work Distribution)
+
+- Imagine suddenly **500 customers** arrive at the food court.
+- If the kitchen tries to prepare all 500 orders immediately:
+  - The kitchen becomes overloaded.
+  - Operations slow down.
+- Instead, the kitchen **intelligently organizes the work**:
+  - Urgent customer orders → prepared immediately.
+  - Less urgent work (ingredient preparation, bulk orders) → scheduled over time.
+- Microsoft Fabric works the same way.
+- Rather than consuming all Capacity Units immediately, Fabric **intelligently distributes the workload over time**.
+- This concept is called **Smoothing**.
+
+---
 ## 2. Spark Autoscaling (Serverless Offloading)
 
 **References:**
@@ -120,7 +159,83 @@ When enabled:
 | **True Autoscaling** | Not natively available for SKU. Requires manual scaling in Azure Portal OR automation via Azure Logic Apps / Azure Runbooks |
 
 ---
+# Spark Capacity Example – Understanding CU, vCores, and Bursting
 
+## Capacity Unit to Spark vCore Mapping
+
+For Spark workloads, a Capacity Unit (CU) can be roughly mapped to Spark vCores.
+
+### Example: F64 Capacity
+
+| Component | Value |
+|-----------|-------|
+| Fabric SKU | F64 |
+| Capacity Units (CU) | 64 |
+| Spark vCores per CU | ~2 |
+| Total Spark vCores | 128 |
+
+### Calculation
+
+| Step | Calculation | Result |
+|------|-------------|--------|
+| Capacity Units | F64 = 64 CU | 64 CU |
+| CU to Spark vCores | 64 × 2 | 128 vCores |
+
+---
+
+## Bursting Example
+
+Microsoft Fabric supports **Bursting**, which allows temporary usage beyond the provisioned capacity.
+
+For Spark workloads, a burst multiplier of approximately **3x** can be applied.
+
+### Calculation
+
+| Step | Calculation | Result |
+|------|-------------|--------|
+| Base Spark vCores | 128 | 128 vCores |
+| Burst Multiplier | 128 × 3 | 384 vCores |
+
+### Maximum Compute Available
+
+| Metric | Value |
+|--------|-------|
+| Base Capacity | 128 Spark vCores |
+| Burst Capacity | ~384 Spark vCores |
+
+> **Result:** An F64 capacity can temporarily provide up to approximately **384 Spark vCores** for highly compute-intensive Spark workloads.
+
+---
+
+### What happens if a workload requires more than 384 Spark vCores?
+
+Fabric does not create unlimited resources automatically.
+
+When compute demand exceeds the available burst capacity, one of the following may occur:
+
+| Scenario | Outcome |
+|----------|---------|
+| Resources available | Job starts immediately |
+| Capacity fully utilized | Job enters queue and waits |
+| Capacity under heavy pressure | New jobs may be delayed or temporarily rejected |
+| If More compute required | Manually Scale to a larger SKU (e.g., F64 → F128) |
+
+### How long can a Spark job continue using 384 vCores?
+
+There is **no fixed duration**.
+
+A Spark job can continue using burst capacity as long as:
+- Sufficient capacity is available
+- The overall Fabric capacity budget has not been exhausted
+- No higher-priority workload requires the resources
+
+| Question | Answer |
+|----------|--------|
+| Fixed time limit? | No |
+| Can Spark continue using 384 vCores? | Yes |
+| Until when? | Until capacity becomes constrained or the workload completes |
+
+---
 ## 3. OneLake Storage
 
 **References:**
