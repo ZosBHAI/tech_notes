@@ -36,4 +36,9 @@ Key Highlights:
 Ref:
 https://www.youtube.com/watch?v=qjUa_gyBAeM
 Approach of leveraging the Spark JVM
+- Using Spark's JVM bridge (spark._jvm) allows direct access to Java JDBC APIs and provides greater flexibility.The Python code invokes Java classes running inside the Spark driver process through Py4J.
+- Authenntication cacn bee Basic, Token based like mentioned in gist
+- this approach used to update the metadata in SQL sevver. Similar can be used for connecting to Fabric Warehouse
+https://gist.github.com/ZosBHAI/f79ff727292a84dbdb8b56d05d39bfd2
+- Limitations : All JDBC operations execute on the Spark driver.They do not run in parallel across executors.
 
