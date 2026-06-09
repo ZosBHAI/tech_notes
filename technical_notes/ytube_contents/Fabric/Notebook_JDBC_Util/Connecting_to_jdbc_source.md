@@ -133,7 +133,7 @@ flowchart TD
     click JayDeBeApi "https://milescole.dev/data-engineering/2024/09/27/Another-Way-to-Connect-to-the-SQL-Endpoint.html" "JayDeBeApi: JDBC from Python"
     click SparkJVM "https://gist.github.com/ZosBHAI/f79ff727292a84dbdb8b56d05d39bfd2" "spark._jvm token auth example"
     click SparkConnector "https://learn.microsoft.com/en-us/fabric/data-engineering/spark-data-warehouse-connector?tabs=pyspark" "Spark Data Warehouse Connector docs"
-    click TSQLMagic "https://learn.microsoft.com/en-us/fabric/data-engineering/notebook-manage-magic-commands#tsql-magic" "%%tsql magic command"
+    click TSQLMagic "https://medium.com/@karlovskyl/can-you-work-with-a-data-warehouse-from-a-fabric-notebook-a16f62e5c891" "%%tsql magic command"
     click FabricConn "https://www.youtube.com/watch?v=qjUa_gyBAeM" "Fabric Connections demo"
     
     style Start fill:#1e293b,stroke:#0f172a,color:#fff
