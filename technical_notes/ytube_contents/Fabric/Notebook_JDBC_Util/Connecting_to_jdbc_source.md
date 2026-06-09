@@ -119,8 +119,7 @@ flowchart TD
     CloudGroup --> TSQLMagic["📜 Option 2: %%tsql Magic<br><br>✅ Direct T-SQL<br>✅ Bind to DataFrame<br>❌ Write not supported"]
     CloudGroup --> FabricConn["🔐 Option 4: Fabric Connections<br><br>✅ Centralized secrets<br>✅ Auto code snippets<br>⚠️ Cloud sources only"]
     
-    %% Best practice annotations
-    SparkConnector --> WriteDetail["📤 Write Process<br>Staging → COPY INTO<br>Automatic credential passthrough"]
+    
     
     %% Recommendation summary
     subgraph Legend["📌 Decision Guide"]
