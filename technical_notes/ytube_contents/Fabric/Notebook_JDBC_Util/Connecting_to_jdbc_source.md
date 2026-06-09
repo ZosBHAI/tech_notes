@@ -106,8 +106,8 @@ flowchart TD
     
     Start --> Decision{🎯 Destination &<br>Workload Type}
     
-    %% On-Prem / Classic SQL Branch
-    Decision -->|On-Prem SQL Server<br>or Generic JDBC| OnPremGroup[🏢 SQL Server /<br>JDBC Sources]
+    %% Any JDBC Source Branch
+    Decision -->|Any JDBC| OnPremGroup[🏢 SQL Server /<br>JDBC Sources]
     
     OnPremGroup --> JayDeBeApi["🐍 Option 1: JayDeBeApi<br><br>✅ Read + Write<br>✅ Any JDBC source<br>⚠️ Per-session package install"]
     OnPremGroup --> SparkJVM["⚙️ Option 5: spark._jvm<br><br>✅ Metadata updates<br>✅ Token auth<br>⚠️ Driver only (not for bulk)"]
@@ -124,7 +124,7 @@ flowchart TD
     %% Recommendation summary
     subgraph Legend["📌 Decision Guide"]
         L1["🔹 Large volume read/write (Fabric WH) → <b>Spark DW Connector</b>"]
-        L2["🔹 On‑prem / light metadata → <b>JayDeBeApi</b> or <b>spark._jvm</b>"]
+        L2["🔹 JDBC / light metadata → <b>JayDeBeApi</b> or <b>spark._jvm</b>"]
         L3["🔹 Read‑only T‑SQL exploration → <b>%%tsql</b>"]
         L4["🔹 Secure cloud credential mgmt → <b>Fabric Connections</b>"]
     end
