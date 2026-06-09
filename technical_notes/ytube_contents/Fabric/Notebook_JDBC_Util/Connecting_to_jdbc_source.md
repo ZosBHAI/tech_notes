@@ -11,9 +11,7 @@ This document summarizes the commonly used connectivity options.
 
 # Option 1: JayDeBeApi (JDBC from Python)
 
-## Overview
-
-JayDeBeApi allows Python code to connect directly to JDBC-compliant databases using Java JDBC drivers.
+- JayDeBeApi allows Python code to connect directly to JDBC-compliant databases using Java JDBC drivers.
 
 ### Key Capabilities
 * Supports both read and write operations.Can be used with any JDBC-compatible source. 
@@ -57,7 +55,8 @@ Recommended approach for reading and writing data between Spark and Microsoft Fa
 ### Reading Data
 
 Use the three-part namespace:
-``` df = spark.read.synapsesql("<warehouse/lakehouse name>.<schema name>.<table or view name>")
+```
+df = spark.read.synapsesql("<warehouse/lakehouse name>.<schema name>.<table or view name>")
 ```
 
 ### Writing Data
@@ -67,10 +66,8 @@ The connector supports writing Spark DataFrames directly to Fabric Warehouse tab
 ### Internal Write Process
 
 The connector performs a **two-step** write operation:
-
-    Stage Spark DataFrame data into intermediate storage.
-
-    Execute a **COPY INTO** operation to load data into the Warehouse.
+    - Stage Spark DataFrame data into intermediate storage.
+    - Execute a **COPY INTO** operation to load data into the Warehouse.
 
 ### Authentication
 
@@ -96,7 +93,7 @@ YouTube Demo: https://www.youtube.com/watch?v=qjUa_gyBAeM
 ## Option 5: Leveraging Spark JVM (spark._jvm)
 - Spark exposes access to the underlying JVM through `spark._jvm`.
 - Using this approach, Python code can directly invoke Java JDBC APIs running inside the Spark driver process through Py4J.
-- Approach is tested for basic and token based authentication mode. Token based approach is available in the [gist]!(https://gist.github.com/ZosBHAI/f79ff727292a84dbdb8b56d05d39bfd2).
+- Approach is tested for basic and token based authentication mode. Token based approach is available in the ![gist](https://gist.github.com/ZosBHAI/f79ff727292a84dbdb8b56d05d39bfd2).
 - This approach has been used to:
     - Update ETL metadata tables in SQL Server/Fabric Warehouse.
     - Execute JDBC operations directly from Fabric notebooks on Microsoft Fabric Warehouse,Azure SQL Database or Other JDBC-compatible platforms.
