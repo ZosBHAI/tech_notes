@@ -48,7 +48,7 @@ The notebook cell starts with %%tsql.
 Fabric interprets the entire cell as T-SQL instead of Python.
 
 ### Limitations
-Cannot write data back to the Fabric Warehouse.
+You can run the full DML and DDL commands against a warehouse or SQL database, but can run only **read-only queries against the lakehouse SQL analytics endpoint**.
 
 ## Option 3: Spark Data Warehouse Connector
 Recommended approach for reading and writing data between Spark and Microsoft Fabric Warehouse.
